@@ -2,9 +2,6 @@
 #define ADL_UNIX_UNIX_H
 
 
-
-
-
 #include "../common/utils.h"
 #include "../ds/string.h"
 
@@ -13,10 +10,10 @@
 
 
 
-typedef struct ADLC_unix
+typedef struct ADL_Unix
 {
 
-}ADLC_unix;
+}ADL_Unix;
 
 
 #endif
