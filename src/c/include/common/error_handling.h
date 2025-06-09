@@ -9,7 +9,7 @@
 
 typedef struct ADL_Result
 {
-	u64 code;
+	s64 code;
 	ADL_String str;
 	void *ptr;
 }ADL_Result;
@@ -40,7 +40,7 @@ typedef struct ADL_Result
 
 
 #ifndef ADL_RESULT_CHECK_ERROR
-#define ADL_RESULT_CHECK_ERROR(res) ADL_CHECK_NOT_EQUAL(((ADL_Result)res).code,0)
+#define ADL_RESULT_CHECK_ERROR(res) ADL_CHECK_EQUAL(((ADL_Result)res).code,-1)
 #endif
 
 

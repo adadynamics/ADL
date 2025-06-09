@@ -805,7 +805,7 @@ static ADL_Result adl_lib_getnameinfo(const struct sockaddr *addr,socklen_t addr
 
 /*
 
-u16 adl_lib_htons(u16 hostshort);
+ADL_Result adl_lib_htons(u16 hostshort);
 
             a wrapper htons library call
 
@@ -820,9 +820,11 @@ u16 adl_lib_htons(u16 hostshort);
 */
 
 
-u16 adl_lib_htons(u16 hostshort)
+ADL_Result adl_lib_htons(u16 hostshort)
 {
-    return ADL_HTONS(hostshort);
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_HTONS(hostshort);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -831,7 +833,7 @@ u16 adl_lib_htons(u16 hostshort)
 
 /*
 
-u32 adl_lib_htonl(u32 hostlong);
+ADL_Result adl_lib_htonl(u32 hostlong);
 
             a wrapper htonl library call
 
@@ -846,9 +848,11 @@ u32 adl_lib_htonl(u32 hostlong);
 */
 
 
-u32 adl_lib_htonl(u32 hostlong)
+ADL_Result adl_lib_htonl(u32 hostlong)
 {
-    return ADL_HTONL(hostlong);
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_HTONL(hostlong);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -857,7 +861,7 @@ u32 adl_lib_htonl(u32 hostlong)
 
 /*
 
-u16 adl_lib_ntohs(u16 netshort);
+ADL_Result adl_lib_ntohs(u16 netshort);
 
             a wrapper ntohs library call
 
@@ -872,9 +876,11 @@ u16 adl_lib_ntohs(u16 netshort);
 */
 
 
-u16 adl_lib_ntohs(u16 netshort)
+ADL_Result adl_lib_ntohs(u16 netshort)
 {
-    return ADL_NTOHS(netshort);
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_NTOHS(netshort);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -883,7 +889,7 @@ u16 adl_lib_ntohs(u16 netshort)
 
 /*
 
-u32 adl_lib_ntohl(u32 netlong);
+ADL_Result adl_lib_ntohl(u32 netlong);
 
             a wrapper ntohl library call
 
@@ -898,9 +904,11 @@ u32 adl_lib_ntohl(u32 netlong);
 */
 
 
-u32 adl_lib_ntohl(u32 netlong)
+ADL_Result adl_lib_ntohl(u32 netlong)
 {
-    return ADL_NTOHL(netlong);
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_NTOHL(netlong);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
 

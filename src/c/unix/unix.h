@@ -1978,10 +1978,10 @@ static ADL_Result adl_sys_getpeername(int sockfd,struct sockaddr *addr,socklen_t
 static ADL_Result adl_lib_getaddrinfo(const char *host,const char *service,struct addrinfo *hints,struct addrinfo **res);
 static ADL_Result adl_lib_freeaddrinfo(struct addrinfo *res);
 static ADL_Result adl_lib_getnameinfo(const struct sockaddr *addr,socklen_t addrlen,char *host,socklen_t hostlen,char *service,socklen_t servicelen,int flags);
-static u16 adl_lib_htons(u16 hostshort);
-static u32 adl_lib_htonl(u32 hostlong);
-static u16 adl_lib_ntohs(u16 netshort);
-static u32 adl_lib_ntohl(u32 netlong);
+static ADL_Result adl_lib_htons(u16 hostshort);
+static ADL_Result adl_lib_htonl(u32 hostlong);
+static ADL_Result adl_lib_ntohs(u16 netshort);
+static ADL_Result adl_lib_ntohl(u32 netlong);
 static ADL_Result adl_sys_open(const char *pathname,int flags,mode_t mode);
 static ADL_Result adl_sys_creat(const char *pathname,mode_t mode);
 static ADL_Result adl_sys_openat(int dirfd,const char *pathname,int flags,mode_t mode);
@@ -2312,14 +2312,14 @@ static ADL_Result adl_lib_crypt(const char *key,const char *salt);
 
 
 #ifndef ADL_UNIX_FINI
-#define ADL_UNIX_FINI(val,valptr)  if(ADL_CHECK_EQUAL(val,-1))  \
-                            {                            \
-                                ADL_String str;          \
-                                adl_string_init(&str,ADL_STRERROR(errno)); \
-                                ADL_RESULT_RETURN_DEFER(failed_syscall, ADL_RESULT_WRITE(1,str,valptr)); \
-                            }                            \
-                                                         \
-                            ADL_RESULT_RETURN_DEFER(success_syscall,ADL_RESULT_WRITE(0,(ADL_String){},valptr));  \
+#define ADL_UNIX_FINI(val,valptr)  if(ADL_CHECK_EQUAL(val,-1))                                                  \
+                            {                                                                                   \
+                                ADL_String str;                                                                 \
+                                adl_string_init(&str,ADL_STRERROR(errno));                                      \
+                                ADL_RESULT_RETURN_DEFER(failed_syscall, ADL_RESULT_WRITE(val,str,valptr));      \
+                            }                                                                                   \
+                                                                                                                \
+                            ADL_RESULT_RETURN_DEFER(success_syscall,ADL_RESULT_WRITE(val,(ADL_String){},valptr));  \
                                                \
                             failed_syscall:    \
                             success_syscall:   \

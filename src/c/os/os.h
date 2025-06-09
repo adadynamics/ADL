@@ -1,12 +1,11 @@
 #ifndef ADL_OS_H
 #define ADL_OS_H
 
-
+#define ADL_OS_UNIX
 #if defined(ADL_OS_UNIX)
 
 #include "../include/unix/unix.h"
 
-ADL_Unix adl_os;
 
 typedef struct iovec ADL_IoVector;
 
@@ -33,6 +32,6 @@ typedef struct ADL_Stat
 
 
 
-
+void ADL_Os_library_init();
 
 #endif

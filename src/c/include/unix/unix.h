@@ -128,10 +128,10 @@ typedef struct ADL_Unix
     ADL_Result (*getaddrinfo)(const char *host,const char *service,struct addrinfo *hints,struct addrinfo **res);
     ADL_Result (*freeaddrinfo)(struct addrinfo *res);
     ADL_Result (*getnameinfo)(const struct sockaddr *addr,socklen_t addrlen,char *host,socklen_t hostlen,char *service,socklen_t servicelen,int flags);
-    u16 (*htons)(u16 hostshort);
-    u32 (*htonl)(u32 hostlong);
-    u16 (*ntohs)(u16 netshort);
-    u32 (*ntohl)(u32 netlong);
+    ADL_Result (*htons)(u16 hostshort);
+    ADL_Result (*htonl)(u32 hostlong);
+    ADL_Result (*ntohs)(u16 netshort);
+    ADL_Result (*ntohl)(u32 netlong);
     ADL_Result (*open)(const char *pathname,int flags,mode_t mode);
     ADL_Result (*creat)(const char *pathname,mode_t mode);
     ADL_Result (*openat)(int dirfd,const char *pathname,int flags,mode_t mode);
