@@ -1,7 +1,9 @@
 #ifndef ADL_OS_NET_SOCKET_SOCKET_H
 #define ADL_OS_NET_SOCKET_SOCKET_H
 
+#include "../../../unix/unix.h"
 #include "../../os.h"
+
 
 typedef u64 ADL_SOCKFD;
 

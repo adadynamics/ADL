@@ -5,6 +5,7 @@
 #if defined(ADL_OS_UNIX)
 
 #include "../include/unix/unix.h"
+#include <linux/if.h>
 
 
 typedef struct iovec ADL_IoVector;

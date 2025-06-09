@@ -21,6 +21,11 @@ typedef struct ADL_Result
 #define ADL_RESULT_INIT(id)  ADL_Result id = (ADL_Result){}
 #endif
 
+
+#ifndef ADL_RESULT_FINI
+#define ADL_RESULT_FINI(id)  (id).code = 0; (id).ptr = NULL; adl_string_fini(&(id).str)
+#endif
+
 #ifndef ADL_RESULT_READ_CODE
 #define ADL_RESULT_READ_CODE(res) ((ADL_Result)(res)).code
 #endif
