@@ -48,6 +48,14 @@ void rename_file(ADL_File *self,const char *name);
 
 void move_file(ADL_File *self,const char *path);
 
+void copy_from_file_name(ADL_File *self,const char *src);
+
+void copy_from_file_file(ADL_File *self,ADL_File *src);
+
+void copy_to_file_name(ADL_File *self,const char *dst);
+
+void copy_to_file_file(ADL_File *self,ADL_File *dst);
+
 void fdatasync_file(ADL_File *self);
 
 void fsync_file(ADL_File *self);
@@ -61,6 +69,10 @@ void chmod_file(ADL_File *self,ADL_FileArgs);
 void chown_file(ADL_File *self,ADL_FileArgs args);
 
 void lchown_file(ADL_File *self,ADL_FileArgs args);
+
+void get_size_file(ADL_File *self);
+
+void set_size_file(ADL_File *self,u64 size);
 
 void close_file(ADL_File *self);
 
