@@ -4,10 +4,11 @@
 
 
 
+ADL_Socket sock;
 
 typedef struct ADL_Raw
 {
-    ADL_Socket sock;
+    ADL_SOCKFD sockfd;
     struct ifreq ifr;
     ADL_Result (*open)(struct ADL_Raw *self,const char *device,u64 protocol);
     ADL_Result (*read)(struct ADL_Raw *self,void *buf,u64 buflen);

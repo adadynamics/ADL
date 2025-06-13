@@ -3,22 +3,24 @@
 
 ADL_Result adl_raw_create(ADL_Raw *self,u64 protocol)
 {
+    ADL_Result rdr_res = (ADL_Result){};
     if(ADL_CHECK_NULL(self))
     {
         ADL_RETURN_DEFER(null_self);
     }
 
-    return self->sock.socket(&self->sock,PF_PACKET,SOCK_RAW,ADL_RESULT_READ_CODE(self->sock.htons(&self->sock,protocol)));
+    rdr_res = sock.socket(PF_PACKET,SOCK_RAW,ADL_RESULT_READ_CODE(sock.htons(protocol)));
+    self->sockfd = ADL_RESULT_READ_CODE(rdr_res);
 
 null_self:
-    return (ADL_Result){};
+    return rdr_res;
 }
 
 
 
 void adl_raw_get_interface_index(ADL_Raw *self,struct ifreq ifr)
 {
-    ioctl(self->sock.sock.sockfd,SIOCGIFINDEX,&ifr);
+    ioctl(self->sockfd,SIOCGIFINDEX,&ifr);
     return;
 }
 
@@ -27,17 +29,17 @@ void adl_raw_get_interface_index(ADL_Raw *self,struct ifreq ifr)
 
 void adl_raw_set_promisc(ADL_Raw *self,struct ifreq ifr)
 {
-    ioctl(self->sock.sock.sockfd,SIOCGIFFLAGS,&ifr);
+    ioctl(self->sockfd,SIOCGIFFLAGS,&ifr);
     ifr.ifr_flags |= IFF_PROMISC;
-    ioctl(self->sock.sock.sockfd,SIOCSIFFLAGS,&ifr);
+    ioctl(self->sockfd,SIOCSIFFLAGS,&ifr);
 }
 
 
 void adl_raw_unset_promisc(ADL_Raw *self,struct ifreq ifr)
 {
-    ioctl(self->sock.sock.sockfd,SIOCGIFFLAGS,&ifr);
+    ioctl(self->sockfd,SIOCGIFFLAGS,&ifr);
     ifr.ifr_flags &= ~IFF_PROMISC;
-    ioctl(self->sock.sock.sockfd,SIOCSIFFLAGS,&ifr);
+    ioctl(self->sockfd,SIOCSIFFLAGS,&ifr);
 }
 
 
@@ -49,15 +51,15 @@ ADL_Result adl_raw_bind(ADL_Raw *self,struct ifreq ifr,u32 protocol)
 
     sll.sll_ifindex   = ifr.ifr_ifindex;
     sll.sll_family    = AF_PACKET;
-    sll.sll_protocol  = ADL_RESULT_READ_CODE(self->sock.htons(&self->sock,protocol));
+    sll.sll_protocol  = ADL_RESULT_READ_CODE(sock.htons(protocol));
 
-    return self->sock.bind(&self->sock,(struct sockaddr *)&sll,sizeof(sll));
+    return sock.bind(self->sockfd,(struct sockaddr *)&sll,sizeof(sll));
 }
 
 
 ADL_Result adl_raw_destroy(ADL_Raw *self)
 {
-    return self->sock.close(&self->sock,self->sock.sock.sockfd);
+    return sock.close(self->sockfd);
 }
 
 
@@ -90,14 +92,14 @@ failed_call:
 
 ADL_Result adl_raw_read(ADL_Raw *self,void *buf,u64 buflen)
 {
-    return self->sock.recvfrom(&self->sock,self->sock.sock.sockfd,buf,buflen,0,NULL,NULL);
+    return sock.recvfrom(self->sockfd,buf,buflen,0,NULL,NULL);
 }
 
 
 
 ADL_Result adl_raw_write(ADL_Raw *self,const void *buf,u64 buflen)
 {
-    return self->sock.sendto(&self->sock,self->sock.sock.sockfd,buf,buflen,0,NULL,0);
+    return sock.sendto(self->sockfd,buf,buflen,0,NULL,0);
 }
 
 
@@ -115,7 +117,7 @@ ADL_Result adl_raw_close(ADL_Raw *self)
 
 void ADL_Raw_init(ADL_Raw *raw)
 {
-    ADL_Socket_init(&raw->sock);
+    ADL_Socket_init(&sock);
     ADL_MEMSET(&raw->ifr,0,sizeof(raw->ifr));
     raw->open    = adl_raw_open;
     raw->read    = adl_raw_read;
@@ -125,7 +127,7 @@ void ADL_Raw_init(ADL_Raw *raw)
 
 void ADL_Raw_fini(ADL_Raw *raw)
 {
-    ADL_Socket_fini(&raw->sock);
+    ADL_Socket_fini(&sock);
     ADL_MEMSET(raw,0,sizeof(ADL_Raw));
     return;
 }
