@@ -48,7 +48,12 @@ void ADL_STRING_fini(ADL_STRING *adl_str)
 	
 	adl_str->size = 0;
 	adl_str->len  = 0;
-	ADL_FREE(adl_str->str);
+
+	if(ADL_CHECK_NOT_NULL(adl_str->str))
+	{
+		ADL_FREE(adl_str->str);
+	}
+
 	adl_str->str  = NULL;
 
 null_adl_str:

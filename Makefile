@@ -8,7 +8,7 @@ LINK= -ladl -lkeyutils -lnuma -lc -lm
 
 CC = gcc
 
-OBJECTS = $(OBJ)/string.o $(OBJ)/unix.o $(OBJ)/socket.o $(OBJ)/os.o $(OBJ)/raw.o
+OBJECTS = $(OBJ)/string.o $(OBJ)/unix.o $(OBJ)/socket.o $(OBJ)/os.o $(OBJ)/raw.o  $(OBJ)/file.o
 ADL_LIB = $(TARGET)/libadl.a
 
 install: $(ADL_LIB)
@@ -19,6 +19,11 @@ install: $(ADL_LIB)
 
 $(ADL_LIB): $(OBJECTS)
 	ar -rv $@ $^
+
+
+$(OBJ)/file.o   : $(SRC_C)/os/file/file.c
+	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
+
 
 $(OBJ)/raw.o   : $(SRC_C)/os/net/raw/raw.c
 	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@

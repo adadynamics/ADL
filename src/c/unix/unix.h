@@ -2316,10 +2316,10 @@ static ADL_RESULT adl_lib_crypt(const char *key,const char *salt);
                             {                                                                                   \
                                 ADL_STRING str;                                                                 \
                                 ADL_STRING_init(&str,ADL_STRERROR(errno));                                      \
-                                ADL_RESULT_RETURN_DEFER(failed_syscall, ADL_RESULT_WRITE(val,str,valptr));      \
+                                ADL_RESULT_RETURN_DEFER(failed_syscall, ADL_RESULT_WRITE(errno,val,str,valptr));      \
                             }                                                                                   \
                                                                                                                 \
-                            ADL_RESULT_RETURN_DEFER(success_syscall,ADL_RESULT_WRITE(val,(ADL_STRING){},valptr));  \
+                            ADL_RESULT_RETURN_DEFER(success_syscall,ADL_RESULT_WRITE(errno,val,(ADL_STRING){},valptr));  \
                                                \
                             failed_syscall:    \
                             success_syscall:   \

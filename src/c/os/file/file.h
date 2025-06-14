@@ -2,79 +2,69 @@
 #define ADL_OS_FILE_FILE_H
 
 #include "../os.h"
+#include "../../include/os/files/file.h"
 
+static void create_file(ADL_FILE *self,const char *name,ADL_FILEARGS args);
 
-typedef struct ADL_FILE
-{
-	u64 fd;
-	void_ptr handle;
-	u64 bytes;
-	u64 err_code;
-	ADL_STRING err_str;
-}ADL_FILE;
+static void open_file(ADL_FILE *self,const char *name,ADL_FILEARGS args);
 
+static void read_file(ADL_FILE *self,void_ptr buf,u64 buf_size);
 
-typedef struct ADL_FILEARGS
-{
+static void write_file(ADL_FILE *self,const void_ptr buf,u64 buf_size);
 
-}ADL_FILEARGS;
+/**
+static void readv_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count);
 
+static void writev_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count);
 
-void create_file(ADL_FILE *self,const char *name,ADL_FILEARGS args);
+static void seek_file(ADL_FILE *self,s64 offset,u64 whence);
 
-void open_file(ADL_FILE *self,ADL_FILEARGS args);
+static void pread_file(ADL_FILE *self,void_ptr buf,u64 bufsize,u64 offset);
 
-void read_file(ADL_FILE *self,void_ptr buf,u64 buf_size);
+static void pwrite_file(ADL_FILE *self,const void_ptr buf,u64 bufsize,u64 offset);
 
-void write_file(ADL_FILE *self,const void_ptr buf,u64 buf_size);
+static void preadv_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset);
 
-void readv_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count);
+static void pwritev_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset);
 
-void writev_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count);
+static void truncate_file(ADL_FILE *self,u64 size);
 
-void seek_file(ADL_FILE *self,s64 offset,u64 whence);
+static void rename_file(ADL_FILE *self,const char *name);
 
-void pread_file(ADL_FILE *self,void_ptr buf,u64 bufsize,u64 offset);
+static void move_file(ADL_FILE *self,const char *path);
 
-void pwrite_file(ADL_FILE *self,const void_ptr buf,u64 bufsize,u64 offset);
+static void copy_from_file_name(ADL_FILE *self,const char *src);
 
-void preadv_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset);
+static void copy_from_file_file(ADL_FILE *self,ADL_FILE *src);
 
-void pwritev_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset);
+static void copy_to_file_name(ADL_FILE *self,const char *dst);
 
-void truncate_file(ADL_FILE *self,u64 size);
+static void copy_to_file_file(ADL_FILE *self,ADL_FILE *dst);
 
-void rename_file(ADL_FILE *self,const char *name);
+static void fdatasync_file(ADL_FILE *self);
 
-void move_file(ADL_FILE *self,const char *path);
+static void fsync_file(ADL_FILE *self);
 
-void copy_from_file_name(ADL_FILE *self,const char *src);
+static void sync_file(ADL_FILE *self);
 
-void copy_from_file_file(ADL_FILE *self,ADL_FILE *src);
+static void stat_file(ADL_FILE *self,ADL_Stat *buf);
 
-void copy_to_file_name(ADL_FILE *self,const char *dst);
+static void chmod_file(ADL_FILE *self,ADL_FILEARGS);
 
-void copy_to_file_file(ADL_FILE *self,ADL_FILE *dst);
+static void chown_file(ADL_FILE *self,ADL_FILEARGS args);
 
-void fdatasync_file(ADL_FILE *self);
+static void lchown_file(ADL_FILE *self,ADL_FILEARGS args);
 
-void fsync_file(ADL_FILE *self);
+static void get_size_file(ADL_FILE *self);
 
-void sync_file(ADL_FILE *self);
+static void set_size_file(ADL_FILE *self,u64 size);
+*/
 
-void stat_file(ADL_FILE *self,ADL_Stat *buf);
+static void close_file(ADL_FILE *self);
 
-void chmod_file(ADL_FILE *self,ADL_FILEARGS);
+static bool check_error_file(ADL_FILE *self);
 
-void chown_file(ADL_FILE *self,ADL_FILEARGS args);
-
-void lchown_file(ADL_FILE *self,ADL_FILEARGS args);
-
-void get_size_file(ADL_FILE *self);
-
-void set_size_file(ADL_FILE *self,u64 size);
-
-void close_file(ADL_FILE *self);
+static void clear_error_file(ADL_FILE *self);
 
 
 #endif

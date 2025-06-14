@@ -10,6 +10,14 @@
 
 typedef struct iovec ADL_IOVEC;
 
+#ifndef ADL_UNIX_BEGIN
+#define ADL_UNIX_BEGIN #ifdef ADL_OS_UNIX
+#endif
+
+#ifndef ADL_UNIX_END
+#define ADL_UNIX_END #endif
+#endif
+
 #else
 #if defined(ADL_OS_WINDOWS)
 

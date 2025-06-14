@@ -4,6 +4,7 @@
 
 #include <sys/types.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include "platform.h"
 #include "types.h"
 #include "error_handling.h"

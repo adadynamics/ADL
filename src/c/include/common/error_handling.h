@@ -9,6 +9,7 @@
 
 typedef struct ADL_RESULT
 {
+	u64 _errno;
 	s64 code;
 	ADL_STRING str;
 	void *ptr;
@@ -26,6 +27,12 @@ typedef struct ADL_RESULT
 #define ADL_RESULT_FINI(id)  (id).code = 0; (id).ptr = NULL; ADL_STRING_fini(&(id).str)
 #endif
 
+
+#ifndef ADL_RESULT_READ_ERRNO
+#define ADL_RESULT_READ_ERRNO(res) ((ADL_RESULT)(res))._errno
+#endif
+
+
 #ifndef ADL_RESULT_READ_CODE
 #define ADL_RESULT_READ_CODE(res) ((ADL_RESULT)(res)).code
 #endif
@@ -40,7 +47,7 @@ typedef struct ADL_RESULT
 
 
 #ifndef ADL_RESULT_WRITE
-#define ADL_RESULT_WRITE(x,y,z) (ADL_RESULT){.code = (x),.str = (y),.ptr = (z)}  
+#define ADL_RESULT_WRITE(w,x,y,z) (ADL_RESULT){._errno = (w),.code = (x),.str = (y),.ptr = (z)}  
 #endif
 
 
