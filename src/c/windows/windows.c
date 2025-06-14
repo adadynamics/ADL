@@ -2,6 +2,7 @@
 
 #define ADL_OS_WINDOWS
 #ifdef ADL_OS_WINDOWS
+
 #include <windows.h>
 #include <winuser.h>
 #include <winsock2.h>

@@ -5,7 +5,7 @@
 #include "../common/types.h"
 
 
-typedef struct ADL_String
+typedef struct ADL_STRING
 {
 	u64 size;
 	u64 len;
@@ -14,12 +14,12 @@ typedef struct ADL_String
 	u64 (*length)(void *self);
 	void (*print)(void *self);
 	void (*println)(void *self);
-}ADL_String;
+}ADL_STRING;
 
 
-void adl_string_init(ADL_String *adl_str,char *str);
+void ADL_STRING_init(ADL_STRING *adl_str,char *str);
 
-void adl_string_fini(ADL_String *adl_str);
+void ADL_STRING_fini(ADL_STRING *adl_str);
 
 
 

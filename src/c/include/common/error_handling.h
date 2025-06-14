@@ -7,45 +7,45 @@
 #include "../ds/string.h"
 
 
-typedef struct ADL_Result
+typedef struct ADL_RESULT
 {
 	s64 code;
-	ADL_String str;
+	ADL_STRING str;
 	void *ptr;
-}ADL_Result;
+}ADL_RESULT;
 
 
 
 
 #ifndef ADL_RESULT_INIT
-#define ADL_RESULT_INIT(id)  ADL_Result id = (ADL_Result){}
+#define ADL_RESULT_INIT(id)  ADL_RESULT id = (ADL_RESULT){}
 #endif
 
 
 #ifndef ADL_RESULT_FINI
-#define ADL_RESULT_FINI(id)  (id).code = 0; (id).ptr = NULL; adl_string_fini(&(id).str)
+#define ADL_RESULT_FINI(id)  (id).code = 0; (id).ptr = NULL; ADL_STRING_fini(&(id).str)
 #endif
 
 #ifndef ADL_RESULT_READ_CODE
-#define ADL_RESULT_READ_CODE(res) ((ADL_Result)(res)).code
+#define ADL_RESULT_READ_CODE(res) ((ADL_RESULT)(res)).code
 #endif
 
 #ifndef ADL_RESULT_READ_STRING
-#define ADL_RESULT_READ_STRING(res) ((ADL_Result)(res)).str
+#define ADL_RESULT_READ_STRING(res) ((ADL_RESULT)(res)).str
 #endif
 
 #ifndef ADL_RESULT_READ_PTR
-#define ADL_RESULT_READ_PTR(res) ((ADL_Result)(res)).ptr
+#define ADL_RESULT_READ_PTR(res) ((ADL_RESULT)(res)).ptr
 #endif
 
 
 #ifndef ADL_RESULT_WRITE
-#define ADL_RESULT_WRITE(x,y,z) (ADL_Result){.code = (x),.str = (y),.ptr = (z)}  
+#define ADL_RESULT_WRITE(x,y,z) (ADL_RESULT){.code = (x),.str = (y),.ptr = (z)}  
 #endif
 
 
 #ifndef ADL_RESULT_CHECK_ERROR
-#define ADL_RESULT_CHECK_ERROR(res) ADL_CHECK_EQUAL(((ADL_Result)res).code,-1)
+#define ADL_RESULT_CHECK_ERROR(res) ADL_CHECK_EQUAL(((ADL_RESULT)res).code,-1)
 #endif
 
 

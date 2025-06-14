@@ -4,10 +4,10 @@
 
 #include "../unix/unix.h"
 
-typedef struct ADL_Os
+typedef struct ADL_OS
 {
 
-}ADL_Os;
+}ADL_OS;
 
-void ADL_Os_library_init();
+void ADL_OS_library_init();
 #endif

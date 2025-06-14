@@ -4,20 +4,20 @@
 
 
 
-ADL_Socket sock;
+ADL_SOCKET sock;
 
-typedef struct ADL_Raw
+typedef struct ADL_RAWDEVICE
 {
     ADL_SOCKFD sockfd;
     struct ifreq ifr;
-    ADL_Result (*open)(struct ADL_Raw *self,const char *device,u64 protocol);
-    ADL_Result (*read)(struct ADL_Raw *self,void *buf,u64 buflen);
-    ADL_Result (*write)(struct ADL_Raw *self,const void *buf,u64 buflen);
-    ADL_Result (*close)(struct ADL_Raw *self);
-}ADL_Raw;
+    ADL_RESULT (*open)(struct ADL_RAWDEVICE *self,const char *device,u64 protocol);
+    ADL_RESULT (*read)(struct ADL_RAWDEVICE *self,void *buf,u64 buflen);
+    ADL_RESULT (*write)(struct ADL_RAWDEVICE *self,const void *buf,u64 buflen);
+    ADL_RESULT (*close)(struct ADL_RAWDEVICE *self);
+}ADL_RAWDEVICE;
 
 
 
-void ADL_Raw_init(ADL_Raw *raw);
+void ADL_RAWDEVICE_init(ADL_RAWDEVICE *raw);
 
-void ADL_Raw_fini(ADL_Raw *raw);
+void ADL_RAWDEVICE_fini(ADL_RAWDEVICE *raw);

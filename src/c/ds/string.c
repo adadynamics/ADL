@@ -8,7 +8,7 @@ void adl_ds_string_println(void *self);
 
 
 
-void adl_string_init(ADL_String *adl_str,char *str)
+void ADL_STRING_init(ADL_STRING *adl_str,char *str)
 {
 	if(ADL_CHECK_NULL(adl_str))
 	{
@@ -39,7 +39,7 @@ null_adl_str:
 
 
 
-void adl_string_fini(ADL_String *adl_str)
+void ADL_STRING_fini(ADL_STRING *adl_str)
 {
 	if(ADL_CHECK_NULL(adl_str))
 	{
@@ -64,7 +64,7 @@ void adl_ds_string_append(void *self,const char *str)
 		ADL_RETURN_DEFER(null_data);
 	}
 
-	ADL_String *self_new = (ADL_String *)self;
+	ADL_STRING *self_new = (ADL_STRING *)self;
 
 	ADL_U64_INIT(str_len);
 	ADL_U64_INIT(size);
@@ -117,7 +117,7 @@ u64 adl_ds_string_length(void *self)
 	}
 
 	
-	len = ((ADL_String *)self)->len;
+	len = ((ADL_STRING *)self)->len;
 
 null_self:
 	return len;
@@ -133,7 +133,7 @@ void adl_ds_string_print(void *self)
 		ADL_RETURN_DEFER(null_self);
 	}
 
-	ADL_PRINTF("%s",((ADL_String *)self)->str);
+	ADL_PRINTF("%s",((ADL_STRING *)self)->str);
 
 null_self:
 	return;	
@@ -149,7 +149,7 @@ void adl_ds_string_println(void *self)
 		ADL_RETURN_DEFER(null_self);
 	}
 
-	ADL_PRINTF("%s\n",((ADL_String *)self)->str);
+	ADL_PRINTF("%s\n",((ADL_STRING *)self)->str);
 
 null_self:
 	return;

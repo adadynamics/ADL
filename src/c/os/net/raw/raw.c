@@ -1,9 +1,9 @@
 #include "../../../include/os/net/raw/raw.h"
 
 
-ADL_Result adl_raw_create(ADL_Raw *self,u64 protocol)
+ADL_RESULT adl_rawdevice_create(ADL_RAWDEVICE *self,u64 protocol)
 {
-    ADL_Result rdr_res = (ADL_Result){};
+    ADL_RESULT rdr_res = (ADL_RESULT){};
     if(ADL_CHECK_NULL(self))
     {
         ADL_RETURN_DEFER(null_self);
@@ -18,7 +18,7 @@ null_self:
 
 
 
-void adl_raw_get_interface_index(ADL_Raw *self,struct ifreq ifr)
+void adl_rawdevice_get_interface_index(ADL_RAWDEVICE *self,struct ifreq ifr)
 {
     ioctl(self->sockfd,SIOCGIFINDEX,&ifr);
     return;
@@ -27,7 +27,7 @@ void adl_raw_get_interface_index(ADL_Raw *self,struct ifreq ifr)
 
 
 
-void adl_raw_set_promisc(ADL_Raw *self,struct ifreq ifr)
+void adl_rawdevice_set_promisc(ADL_RAWDEVICE *self,struct ifreq ifr)
 {
     ioctl(self->sockfd,SIOCGIFFLAGS,&ifr);
     ifr.ifr_flags |= IFF_PROMISC;
@@ -35,7 +35,7 @@ void adl_raw_set_promisc(ADL_Raw *self,struct ifreq ifr)
 }
 
 
-void adl_raw_unset_promisc(ADL_Raw *self,struct ifreq ifr)
+void adl_rawdevice_unset_promisc(ADL_RAWDEVICE *self,struct ifreq ifr)
 {
     ioctl(self->sockfd,SIOCGIFFLAGS,&ifr);
     ifr.ifr_flags &= ~IFF_PROMISC;
@@ -44,7 +44,7 @@ void adl_raw_unset_promisc(ADL_Raw *self,struct ifreq ifr)
 
 
 
-ADL_Result adl_raw_bind(ADL_Raw *self,struct ifreq ifr,u32 protocol)
+ADL_RESULT adl_rawdevice_bind(ADL_RAWDEVICE *self,struct ifreq ifr,u32 protocol)
 {
     struct sockaddr_ll sll;
     ADL_MEMSET(&sll,0,sizeof(sll));
@@ -57,7 +57,7 @@ ADL_Result adl_raw_bind(ADL_Raw *self,struct ifreq ifr,u32 protocol)
 }
 
 
-ADL_Result adl_raw_destroy(ADL_Raw *self)
+ADL_RESULT adl_rawdevice_destroy(ADL_RAWDEVICE *self)
 {
     return sock.close(self->sockfd);
 }
@@ -67,10 +67,10 @@ ADL_Result adl_raw_destroy(ADL_Raw *self)
 
 
 
-ADL_Result adl_raw_open(ADL_Raw *self,const char *device,u64 protocol)
+ADL_RESULT adl_rawdevice_open(ADL_RAWDEVICE *self,const char *device,u64 protocol)
 {
-    ADL_Result res = (ADL_Result){};
-    res = adl_raw_create(self,protocol);
+    ADL_RESULT res = (ADL_RESULT){};
+    res = adl_rawdevice_create(self,protocol);
     if(ADL_RESULT_CHECK_ERROR(res))
     {
         ADL_RETURN_DEFER(failed_call);
@@ -79,10 +79,10 @@ ADL_Result adl_raw_open(ADL_Raw *self,const char *device,u64 protocol)
     ADL_RESULT_FINI(res);
 
     ADL_STRNCPY(self->ifr.ifr_name,device,IFNAMSIZ);
-    adl_raw_get_interface_index(self,self->ifr);
-    adl_raw_set_promisc(self,self->ifr);
+    adl_rawdevice_get_interface_index(self,self->ifr);
+    adl_rawdevice_set_promisc(self,self->ifr);
 
-    return adl_raw_bind(self,self->ifr,protocol);
+    return adl_rawdevice_bind(self,self->ifr,protocol);
 
 failed_call:
     return res;
@@ -90,44 +90,44 @@ failed_call:
 
 
 
-ADL_Result adl_raw_read(ADL_Raw *self,void *buf,u64 buflen)
+ADL_RESULT adl_rawdevice_read(ADL_RAWDEVICE *self,void *buf,u64 buflen)
 {
     return sock.recvfrom(self->sockfd,buf,buflen,0,NULL,NULL);
 }
 
 
 
-ADL_Result adl_raw_write(ADL_Raw *self,const void *buf,u64 buflen)
+ADL_RESULT adl_rawdevice_write(ADL_RAWDEVICE *self,const void *buf,u64 buflen)
 {
     return sock.sendto(self->sockfd,buf,buflen,0,NULL,0);
 }
 
 
 
-ADL_Result adl_raw_close(ADL_Raw *self)
+ADL_RESULT adl_rawdevice_close(ADL_RAWDEVICE *self)
 {
-    adl_raw_unset_promisc(self,self->ifr);
+    adl_rawdevice_unset_promisc(self,self->ifr);
     ADL_MEMSET(&self->ifr,0,sizeof(self->ifr));
-    return adl_raw_destroy(self);
+    return adl_rawdevice_destroy(self);
 }
 
 
 
 
 
-void ADL_Raw_init(ADL_Raw *raw)
+void ADL_RAWDEVICE_init(ADL_RAWDEVICE *raw)
 {
-    ADL_Socket_init(&sock);
+    ADL_SOCKET_init(&sock);
     ADL_MEMSET(&raw->ifr,0,sizeof(raw->ifr));
-    raw->open    = adl_raw_open;
-    raw->read    = adl_raw_read;
-    raw->write   = adl_raw_write;
-    raw->close   = adl_raw_close;
+    raw->open    = adl_rawdevice_open;
+    raw->read    = adl_rawdevice_read;
+    raw->write   = adl_rawdevice_write;
+    raw->close   = adl_rawdevice_close;
 }
 
-void ADL_Raw_fini(ADL_Raw *raw)
+void ADL_RAWDEVICE_fini(ADL_RAWDEVICE *raw)
 {
-    ADL_Socket_fini(&sock);
-    ADL_MEMSET(raw,0,sizeof(ADL_Raw));
+    ADL_SOCKET_fini(&sock);
+    ADL_MEMSET(raw,0,sizeof(ADL_RAWDEVICE));
     return;
 }

@@ -1,9 +1,9 @@
 #include "os.h"
-ADL_Unix adl_os;
+ADL_UNIX adl_os;
 
 
-void ADL_Os_library_init(void)
+void ADL_OS_library_init(void)
 {
-    ADL_Unix_init(&adl_os);
+    ADL_UNIX_init(&adl_os);
     return;
 }
