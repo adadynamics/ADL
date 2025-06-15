@@ -403,10 +403,79 @@ static void move_file(ADL_FILE *self,const char *path)
 	return rename_file(self,path);
 }
 
-
 /*
+
 static void copy_from_file_name(ADL_FILE *self,const char *src)
 {
+
+#ifdef ADL_OS_UNIX
+
+	if(ADL_CHECK_NULL(self) || ADL_CHECK_NOT_EQUAL(self->error_code,0))
+	{
+		ADL_RETURN_DEFER(null_self);
+	}
+	
+	ADL_FILE file;
+	ADL_FILE_init(&file);
+
+	ADL_FILEARGS args = {
+		.flags = O_RDONLY
+	};
+
+	file.open(&file,src,args);
+	if(ADL_CHECK_EQUAL(file.check_error(&file),false))
+	{
+		ADL_RETURN_DEFER(failed_file_open);
+	}
+	
+	u64 size = get_size_file(&file);
+	if(ADL_CHECK_EQUAL(file.check_error(&file),false))
+	{
+		ADL_RETURN_DEFER(failed_file_getsize);
+	}
+	
+	char *buf = (char *)ADL_CALLOC(size,sizeof(char));
+	
+	file.read(&file,buf,size);
+	if(ADL_CHECK_EQUAL(file.check_error(&file),false))
+	{
+		ADL_RETURN_DEFER(failed_file_read);
+	}
+
+	u64 size_tmp = get_size_file(self);
+	self->set_size(self,size);
+	if(ADL_CHECK_EQUAL(file.check_error(self),false))
+	{
+		ADL_RETURN_DEFER(failed_self_setsize);
+	}
+
+	self->pwrite(self,buf,size,0);
+	if(ADL_CHECK_EQUAL(file.check_error(self),false))
+	{
+		ADL_RETURN_DEFER(failed_self_read);
+	}
+
+
+
+
+
+	ADL_RETURN_DEFER(success_call);
+
+success_call:
+failed_self_read:
+	self->set_size(self,size_tmp);
+failed_self_setsize:
+failed_file_read:
+	ADL_FREE(buf);
+failed_file_getsize:
+	file.close(&file);
+failed_file_open:
+	ADL_FILE_fini(&file);
+null_self:
+	return;
+#endif
+
+
 
 }
 
@@ -431,8 +500,8 @@ static void copy_to_file_file(ADL_FILE *self,ADL_FILE *dst)
 
 }
 
-*/
 
+*/
 
 static void fdatasync_file(ADL_FILE *self)
 {
@@ -740,11 +809,15 @@ void ADL_FILE_init(ADL_FILE *file)
 		ADL_RETURN_DEFER(null_file);
 	}
 
-	file->fd         	= 0;
-	file->error_code   	= 0;
-	file->error_string 		= (ADL_STRING){};
-	file->handle     	= NULL;
-	file->bytes      	= 0;
+	file->fd         	   = 0;
+	file->error_code   	   = 0;
+	file->size             = 0;
+	file->name             = (ADL_STRING){};
+	file->error_string 	   = (ADL_STRING){};
+	file->handle     	   = NULL;
+	file->bytes      	   = 0;
+	file->current_offset   = 0;
+	file->previous_offset  = 0;
 
 	file->create     	= create_file;
 	file->open       	= open_file;
