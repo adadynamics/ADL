@@ -55,7 +55,7 @@ static void chown_file(ADL_FILE *self,ADL_FILEARGS args);
 
 static void lchown_file(ADL_FILE *self,ADL_FILEARGS args);
 
-static void get_size_file(ADL_FILE *self);
+static u64 get_size_file(ADL_FILE *self);
 
 static void set_size_file(ADL_FILE *self,u64 size);
 */
