@@ -2,804 +2,665 @@
 #include "file.h"
 
 
-extern ADL_UNIX adl_os;
 
-#ifndef ADL_CONSTRUCTOR_INIT
-#define ADL_CONSTRUCTOR_INIT(self)	if(ADL_CHECK_NULL(self) || ADL_CHECK_NOT_EQUAL(self->error_code,0))					\
-				      				{																					\
-					      				ADL_RETURN_DEFER(null_self);													\
-				      				}																					
-#endif
+extern ADL_FILE_LINUX file_linux;
 
 
-#ifndef ADL_CONSTRUCTOR_FINI
-#define ADL_CONSTRUCTOR_FINI()		failed_call:																		\
-				      				null_self:																			\
-					  				success_call:																		\
-					  					return;			
-#endif
-
-
-#ifndef ADL_RESET_FILE_SELF
-#define ADL_RESET_FILE_SELF(self)         (self)->error_code = 0; (self)->error_string = (ADL_STRING){}; (self)->bytes = 0
-#endif
-
-
-
-
-
-
-static void create_file(ADL_FILE *self,const char *name,ADL_FILEARGS args)
+static ADL_RESULT create_file_v2(const char *name,ADL_FILE_ARGS args)
 {
-
 #ifdef ADL_OS_UNIX
-	
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
+	return file_linux.creat(name,args.mode);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT delete_file_v2(const char *name)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.unlink(name);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT open_file_v2(const char *name,ADL_FILE_ARGS args)
+{
+#ifdef ADL_OS_UNIX
+	args.flags &= O_CREAT;
+	args.mode  = 0;
+	return file_linux.open(name,args.flags,args.mode);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+
+ADL_RESULT set_desc_file(ADL_FILE_DESC *desc,ADL_RESULT res)
+{
 	ADL_RESULT_INIT(rdr_res);
 
-	rdr_res = adl_os.open(name,args.flags,args.mode);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	if(ADL_CHECK_NULL(desc))
 	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);	
+		ADL_RETURN_DEFER(null_desc);
 	}
 
-	char *name_tmp = (char *)name;
-	ADL_STRING_init(&self->name,name_tmp);
-	self->fd = ADL_RESULT_READ_CODE(rdr_res);
-	ADL_RETURN_DEFER(success_call);
-
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+	desc->fd = ADL_RESULT_READ_CODE(res);
+	desc->handle = ADL_RESULT_READ_PTR(res);
+	
+	
+null_desc:
+	return rdr_res;
 }
 
 
 
-static void open_file(ADL_FILE *self,const char *name,ADL_FILEARGS args)
+static ADL_RESULT read_file_v1(ADL_FILE_DESC fd,void_ptr buf,u64 buf_size)
 {
-
 #ifdef ADL_OS_UNIX
-
-		ADL_CONSTRUCTOR_INIT(self);
-		ADL_RESET_FILE_SELF(self);
-		ADL_RESULT_INIT(rdr_res);
-		
-		rdr_res = adl_os.open(name,args.flags,args.mode);
-		if(ADL_RESULT_CHECK_ERROR(rdr_res))
-		{
-				self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-				self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-				ADL_RETURN_DEFER(failed_call);
-		}
-
-		char *name_tmp = (char *)name;
-		ADL_STRING_init(&self->name,name_tmp);
-		self->fd = ADL_RESULT_READ_CODE(rdr_res);
-		ADL_RETURN_DEFER(success_call);
+	u64 desc = fd.fd;
+	return file_linux.read(desc,buf,buf_size);
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+#endif
 }
 
 
 
-static void read_file(ADL_FILE *self,void_ptr buf,u64 buf_size)
+static ADL_RESULT write_file_v1(ADL_FILE_DESC fd,const void_ptr buf,u64 buf_size)
 {
-
 #ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.write(desc,buf,buf_size);
+#else
+#ifdef ADL_OS_WINDOWS
 
-	ADL_CONSTRUCTOR_INIT(self);
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT read_all_file_v1(ADL_FILE_DESC fd,void_ptr buf,u64 buf_size)
+{
 	ADL_RESULT_INIT(rdr_res);
 	ADL_S64_INIT(numread);
+	ADL_VOID_PTR_INIT(buf_tmp);
+	buf_tmp = buf;
 
-	while(1)
+	while(true)
 	{
-		rdr_res = adl_os.read(self->fd,buf,buf_size);
+		rdr_res = read_file_v1(fd,buf_tmp,buf_size);
 		numread = ADL_RESULT_READ_CODE(rdr_res);
 		if(ADL_RESULT_CHECK_ERROR(rdr_res))
 		{
-			if(ADL_RESULT_READ_ERRNO(rdr_res) == EINTR)
+			if(ADL_CHECK_EQUAL(ADL_RESULT_READ_ERRNO(rdr_res),EINTR))
 			{
 				ADL_RESULT_FINI(rdr_res);
 				continue;
 			}
 
-			ADL_RETURN_DEFER(failed_read);
+			ADL_RETURN_DEFER(failed_call);
 		}
 		else if(ADL_CHECK_EQUAL(numread,0))
 		{
 			ADL_RETURN_DEFER(success_call);
 		}
 
-		buf      += numread;
-		buf_size -= numread;
+		buf_tmp   += numread;
+		buf_size  -= numread;
 	}
 
-
-	failed_read:
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res);
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+success_call:
+	rdr_res.code = (s64)(buf_tmp - buf);
+failed_call:
+	return rdr_res;
 }
 
 
 
-static void write_file(ADL_FILE *self,const void_ptr buf,u64 buf_size)
+static ADL_RESULT write_all_file_v1(ADL_FILE_DESC fd,const void_ptr buf,u64 buf_size)
 {
-
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
 	ADL_RESULT_INIT(rdr_res);
 	ADL_S64_INIT(numwrite);
 	ADL_VOID_PTR_INIT(buf_tmp);
 
 	buf_tmp = buf;
 
-	while(1)
+
+	while(true)
 	{
-		rdr_res = adl_os.write(self->fd,buf_tmp,buf_size);
+		rdr_res = write_file_v1(fd,buf_tmp,buf_size);
 		numwrite = ADL_RESULT_READ_CODE(rdr_res);
+
 		if(ADL_RESULT_CHECK_ERROR(rdr_res))
 		{
-			if(ADL_RESULT_READ_ERRNO(rdr_res) == EINTR)
+			if(ADL_CHECK_EQUAL(ADL_RESULT_READ_ERRNO(rdr_res),EINTR))
 			{
 				ADL_RESULT_FINI(rdr_res);
 				continue;
 			}
 
-			ADL_RETURN_DEFER(failed_read);
+			ADL_RETURN_DEFER(failed_call);
 		}
 		else if(ADL_CHECK_EQUAL(numwrite,0))
 		{
 			ADL_RETURN_DEFER(success_call);
 		}
 
-		buf_tmp      += numwrite;
-		buf_size -= numwrite;
+		buf_tmp   += numwrite;
+		buf_size  -= numwrite;
 	}
-
-
-	failed_read:
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res);
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
-}
-
-/**
-
-static void readv_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count)
-{
-
-}
-
-
-
-static void writev_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count)
-{
-
-}
-
-*/
-
-static void seek_file(ADL_FILE *self,s64 offset,u64 whence)
-{
-
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.lseek(self->fd,offset,whence);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
-	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-	}
-
-	self->previous_offset = ADL_RESULT_READ_CODE(rdr_res);
-	ADL_RETURN_DEFER(success_call);
-
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
-}
-
-
-
-static void pread_file(ADL_FILE *self,void_ptr buf,u64 bufsize,u64 offset)
-{
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	ADL_S64_INIT(numread);
-
-	
-
-	while(1)
-	{
-		rdr_res = adl_os.pread(self->fd,buf,bufsize,offset);
-		numread = ADL_RESULT_READ_CODE(rdr_res);
-
-		if(ADL_RESULT_CHECK_ERROR(rdr_res))
-		{
-			if(ADL_RESULT_READ_ERRNO(rdr_res) == EINTR)
-			{
-				ADL_RESULT_FINI(rdr_res);
-				continue;
-			}
-
-			ADL_RETURN_DEFER(failed_read);
-		}
-		else if(ADL_CHECK_EQUAL(numread,0))
-		{
-			ADL_RETURN_DEFER(success_call);
-		}
-
-		buf       += numread;
-		bufsize   -= numread;
-		offset    += numread;
-	}
-
-	
-	failed_read:
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
-}
-
-
-
-static void pwrite_file(ADL_FILE *self,const void_ptr buf,u64 bufsize,u64 offset)
-{
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	ADL_S64_INIT(numread);
-	ADL_VOID_PTR_INIT(buf_tmp);
-
-	buf_tmp = buf;
-	
-
-	while(1)
-	{
-		rdr_res = adl_os.pread(self->fd,buf_tmp,bufsize,offset);
-		numread = ADL_RESULT_READ_CODE(rdr_res);
-
-		if(ADL_RESULT_CHECK_ERROR(rdr_res))
-		{
-			if(ADL_RESULT_READ_ERRNO(rdr_res) == EINTR)
-			{
-				ADL_RESULT_FINI(rdr_res);
-				continue;
-			}
-
-			ADL_RETURN_DEFER(failed_read);
-		}
-		else if(ADL_CHECK_EQUAL(numread,0))
-		{
-			ADL_RETURN_DEFER(success_call);
-		}
-
-		buf_tmp       += numread;
-		bufsize   -= numread;
-		offset    += numread;
-	}
-
-	
-	failed_read:
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-}
-
-
-/*
-static void preadv_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset)
-{
-
-}
-
-
-
-static void pwritev_file(ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset)
-{
-
-}
-
-*/
-
-
-
-static void truncate_file(ADL_FILE *self,u64 size)
-{
-
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.ftruncate(self->fd,size);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
-	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-	}
-
-	self->size = size;
-	ADL_RETURN_DEFER(success_call);
-
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
-}
-
-
-
-static void rename_file(ADL_FILE *self,const char *name)
-{
-
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.rename(self->name.str,name);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
-	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-	}
-
-	
-	ADL_STRING_fini(&self->name);
-	char *name_tmp = (char *)name;
-	ADL_STRING_init(&self->name,name_tmp);
-	ADL_RETURN_DEFER(success_call);
-
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
-}
-
-
-
-static void move_file(ADL_FILE *self,const char *path)
-{
-	return rename_file(self,path);
-}
-
-/*
-
-static void copy_from_file_name(ADL_FILE *self,const char *src)
-{
-
-#ifdef ADL_OS_UNIX
-
-	if(ADL_CHECK_NULL(self) || ADL_CHECK_NOT_EQUAL(self->error_code,0))
-	{
-		ADL_RETURN_DEFER(null_self);
-	}
-	
-	ADL_FILE file;
-	ADL_FILE_init(&file);
-
-	ADL_FILEARGS args = {
-		.flags = O_RDONLY
-	};
-
-	file.open(&file,src,args);
-	if(ADL_CHECK_EQUAL(file.check_error(&file),false))
-	{
-		ADL_RETURN_DEFER(failed_file_open);
-	}
-	
-	u64 size = get_size_file(&file);
-	if(ADL_CHECK_EQUAL(file.check_error(&file),false))
-	{
-		ADL_RETURN_DEFER(failed_file_getsize);
-	}
-	
-	char *buf = (char *)ADL_CALLOC(size,sizeof(char));
-	
-	file.read(&file,buf,size);
-	if(ADL_CHECK_EQUAL(file.check_error(&file),false))
-	{
-		ADL_RETURN_DEFER(failed_file_read);
-	}
-
-	u64 size_tmp = get_size_file(self);
-	self->set_size(self,size);
-	if(ADL_CHECK_EQUAL(file.check_error(self),false))
-	{
-		ADL_RETURN_DEFER(failed_self_setsize);
-	}
-
-	self->pwrite(self,buf,size,0);
-	if(ADL_CHECK_EQUAL(file.check_error(self),false))
-	{
-		ADL_RETURN_DEFER(failed_self_read);
-	}
-
-
-
-
-
-	ADL_RETURN_DEFER(success_call);
 
 success_call:
-failed_self_read:
-	self->set_size(self,size_tmp);
-failed_self_setsize:
-failed_file_read:
-	ADL_FREE(buf);
-failed_file_getsize:
-	file.close(&file);
-failed_file_open:
-	ADL_FILE_fini(&file);
-null_self:
-	return;
-#endif
-
-
-
+	rdr_res.code = (s64)(buf_tmp - buf);
+failed_call:
+	return rdr_res;
 }
 
 
 
-static void copy_from_file_file(ADL_FILE *self,ADL_FILE *src)
+
+static ADL_RESULT readv_file_v1(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count)
 {
-
-}
-
-
-
-static void copy_to_file_name(ADL_FILE *self,const char *dst)
-{
-
-}
-
-
-
-static void copy_to_file_file(ADL_FILE *self,ADL_FILE *dst)
-{
-
-}
-
-
-*/
-
-static void fdatasync_file(ADL_FILE *self)
-{
-	
 #ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.fdatasync(self->fd);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
-	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-	}
-
-	ADL_RETURN_DEFER(success_call);
+	u64 desc = fd.fd;
+	return file_linux.readv(desc,iov,count);
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+#endif
 }
 
 
-
-static void fsync_file(ADL_FILE *self)
+static ADL_RESULT writev_file_v1(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count)
 {
-	
 #ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.fsync(self->fd);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
-	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-	}
-
-	ADL_RETURN_DEFER(success_call);
+	u64 desc = fd.fd;
+	return file_linux.writev(desc,iov,count);
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+#endif
 }
 
 
-static void sync_file(ADL_FILE *self)
+
+static ADL_RESULT seek_file_v1(ADL_FILE_DESC fd,s64 offset,u64 whence)
 {
-	
 #ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
-	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.sync();
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
-	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-		ADL_RETURN_DEFER(failed_call);
-	}
-
-	ADL_RETURN_DEFER(success_call);
+	u64 desc = fd.fd;
+	return file_linux.lseek(desc,offset,whence);
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+#endif
 }
 
 
 
-static void stat_file(ADL_FILE *self,ADL_STAT *buf)
+static ADL_RESULT pread_file_v1(ADL_FILE_DESC fd,void_ptr buf,u64 buf_size,u64 offset)
 {
-	
 #ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.pread(desc,buf,buf_size,offset);
+#else
+#ifdef ADL_OS_WINDOWS
 
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT pwrite_file_v1(ADL_FILE_DESC fd,const void_ptr buf,u64 buf_size,u64 offset)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.pwrite(desc,buf,buf_size,offset);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+static ADL_RESULT preadv_file_v1(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count,u64 offset)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.preadv(desc,iov,count,offset);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT pwritev_file_v1(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count,u64 offset)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.pwritev(desc,iov,count,offset);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+
+static ADL_RESULT truncate_file_v1(ADL_FILE_DESC fd,u64 size)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.ftruncate(desc,size);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT truncate_file_v2(const char *name,u64 size)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.truncate(name,size);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT rename_file_v2(const char *oldname,const char *newname)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.rename(oldname,newname);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT move_file_v2(const char *oldname,const char *newname)
+{
+	return rename_file_v2(oldname,newname);
+}
+
+
+
+static ADL_RESULT fdatasync_file_v1(ADL_FILE_DESC fd)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.fdatasync(desc);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT fsync_file_v1(ADL_FILE_DESC fd)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.fsync(desc);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT sync_file_v1(void)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.sync();
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT stat_file_v1(ADL_FILE_DESC fd,ADL_STAT *buf)
+{
 	ADL_RESULT_INIT(rdr_res);
-
 	if(ADL_CHECK_NULL(buf))
 	{
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	struct stat statbuf;
-	
-	
-	rdr_res = adl_os.fstat(self->fd,&statbuf);
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	struct stat sb;
+
+	rdr_res = file_linux.fstat(desc,&sb);
 	if(ADL_RESULT_CHECK_ERROR(rdr_res))
 	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	
-	buf->st_dev      = statbuf.st_dev;
-	buf->st_ino      = statbuf.st_ino;
-	buf->st_mode     = statbuf.st_mode;
-	buf->st_nlink    = statbuf.st_nlink;
-	buf->st_uid      = statbuf.st_uid;
-	buf->st_gid      = statbuf.st_gid;
-	buf->st_rdev     = statbuf.st_rdev;
-	buf->st_size     = statbuf.st_size;
-	buf->st_blksize  = statbuf.st_blksize;
-	buf->st_blocks   = statbuf.st_blocks;
-	buf->st_atim     = statbuf.st_atim;
-	buf->st_mtim     = statbuf.st_mtim;
-	buf->st_ctim     = statbuf.st_ctim;
+	buf->st_dev       = sb.st_dev;
+	buf->st_ino       = sb.st_ino;
+	buf->st_mode      = sb.st_mode;
+	buf->st_nlink     = sb.st_nlink;
+	buf->st_uid       = sb.st_uid;
+	buf->st_gid       = sb.st_gid;
+	buf->st_rdev      = sb.st_rdev;
+	buf->st_size      = sb.st_size;
+	buf->st_blksize   = sb.st_blksize;
+	buf->st_blocks    = sb.st_blocks;
+	buf->st_atim      = sb.st_atim;
+	buf->st_mtim      = sb.st_mtim;
+	buf->st_ctim      = sb.st_ctim;
 
-	ADL_RETURN_DEFER(success_call);
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
+#endif
 
-	ADL_CONSTRUCTOR_FINI();
-
+failed_call:
+	return rdr_res;
 }
 
 
 
-static void chmod_file(ADL_FILE *self,ADL_FILEARGS args)
+static ADL_RESULT stat_file_v2(const char *name,ADL_STAT *buf)
 {
-	
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
 	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.fchmod(self->fd,args.mode);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	if(ADL_CHECK_NULL(buf))
 	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	ADL_RETURN_DEFER(success_call);
+#ifdef ADL_OS_UNIX
+	struct stat sb;
+
+	rdr_res = file_linux.stat(name,&sb);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	buf->st_dev       = sb.st_dev;
+	buf->st_ino       = sb.st_ino;
+	buf->st_mode      = sb.st_mode;
+	buf->st_nlink     = sb.st_nlink;
+	buf->st_uid       = sb.st_uid;
+	buf->st_gid       = sb.st_gid;
+	buf->st_rdev      = sb.st_rdev;
+	buf->st_size      = sb.st_size;
+	buf->st_blksize   = sb.st_blksize;
+	buf->st_blocks    = sb.st_blocks;
+	buf->st_atim      = sb.st_atim;
+	buf->st_mtim      = sb.st_mtim;
+	buf->st_ctim      = sb.st_ctim;
+
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
+#endif
 
-	ADL_CONSTRUCTOR_FINI();
-
+failed_call:
+	return rdr_res;
 }
 
 
 
-static void chown_file(ADL_FILE *self,ADL_FILEARGS args)
+static ADL_RESULT stat_file_v3(const char *name,ADL_STAT *buf)
 {
-	
-#ifdef ADL_OS_UNIX
-
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
 	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.fchown(self->fd,args.uid,args.gid);
-	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	if(ADL_CHECK_NULL(buf))
 	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	ADL_RETURN_DEFER(success_call);
+#ifdef ADL_OS_UNIX
+	struct stat sb;
+
+	rdr_res = file_linux.lstat(name,&sb);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	buf->st_dev       = sb.st_dev;
+	buf->st_ino       = sb.st_ino;
+	buf->st_mode      = sb.st_mode;
+	buf->st_nlink     = sb.st_nlink;
+	buf->st_uid       = sb.st_uid;
+	buf->st_gid       = sb.st_gid;
+	buf->st_rdev      = sb.st_rdev;
+	buf->st_size      = sb.st_size;
+	buf->st_blksize   = sb.st_blksize;
+	buf->st_blocks    = sb.st_blocks;
+	buf->st_atim      = sb.st_atim;
+	buf->st_mtim      = sb.st_mtim;
+	buf->st_ctim      = sb.st_ctim;
+
+#else
+#ifdef ADL_OS_WINDOWS
 
 #endif
+#endif
 
-	ADL_CONSTRUCTOR_FINI();
-
+failed_call:
+	return rdr_res;
 }
 
 
 
-static void lchown_file(ADL_FILE *self,ADL_FILEARGS args)
+static ADL_RESULT chmod_file_v1(ADL_FILE_DESC fd,ADL_FILE_ARGS args)
 {
-	
 #ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.fchmod(desc,args.mode);
+#else
+#ifdef ADL_OS_WINDOWS
 
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_RESET_FILE_SELF(self);
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT chmod_file_v2(const char *name,ADL_FILE_ARGS args)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.chmod(name,args.mode);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT chown_file_v1(ADL_FILE_DESC fd,ADL_FILE_ARGS args)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.fchown(desc,args.uid,args.gid);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT chown_file_v2(const char *name,ADL_FILE_ARGS args)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.chown(name,args.uid,args.gid);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT chown_file_v3(const char *name,ADL_FILE_ARGS args)
+{
+#ifdef ADL_OS_UNIX
+	return file_linux.lchown(name,args.uid,args.gid);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+
+static ADL_RESULT get_size_file_v1(ADL_FILE_DESC fd)
+{
 	ADL_RESULT_INIT(rdr_res);
-	
-	rdr_res = adl_os.lchown(self->name.str,args.uid,args.gid);
+
+	ADL_STAT stat_buf;
+	rdr_res = stat_file_v1(fd,&stat_buf);
+
 	if(ADL_RESULT_CHECK_ERROR(rdr_res))
 	{
-		self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res); 
-		self->error_string = ADL_RESULT_READ_STRING(rdr_res);
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	ADL_RETURN_DEFER(success_call);
-
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
-}
+	rdr_res.code = stat_buf.st_size;
 
 
-
-static u64 get_size_file(ADL_FILE *self)
-{
-	ADL_CONSTRUCTOR_INIT(self);
-	ADL_STAT buf;
-
-	stat_file(self,&buf);
-	self->size = buf.st_size;
-
-	return self->size;
-
-null_self:
-	return 0;
-}
-
-
-
-static void set_size_file(ADL_FILE *self,u64 size)
-{
-	return truncate_file(self,size);
-}
-
-
-
-static void close_file(ADL_FILE *self)
-{
-
-#ifdef ADL_OS_UNIX
-
-		ADL_CONSTRUCTOR_INIT(self);
-		ADL_RESULT_INIT(rdr_res);
-
-		ADL_STRING_fini(&self->name);
-
-		rdr_res = adl_os.close(self->fd);
-		if(ADL_RESULT_CHECK_ERROR(rdr_res))
-		{
-				self->error_code  = ADL_RESULT_READ_ERRNO(rdr_res);
-				self->error_string = ADL_RESULT_READ_STRING(rdr_res);
-				ADL_RETURN_DEFER(failed_call);
-		}
-		
-		ADL_RETURN_DEFER(success_call);
-
-#endif
-
-	ADL_CONSTRUCTOR_FINI();
-
+failed_call:
+	return rdr_res;
 }
 
 
 
 
 
-static bool check_error_file(ADL_FILE *self)
+static ADL_RESULT get_size_file_v2(const char *name)
 {
-	ADL_CONSTRUCTOR_INIT(self);
-	
-	if(ADL_CHECK_EQUAL(self->error_code,0))
+	ADL_RESULT_INIT(rdr_res);
+
+	ADL_STAT stat_buf;
+	rdr_res = stat_file_v2(name,&stat_buf);
+
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
 	{
-		ADL_RETURN_DEFER(success_call);
+		ADL_RETURN_DEFER(failed_call);
 	}
 
-null_self:
+	rdr_res.code = stat_buf.st_size;
+
+
+failed_call:
+	return rdr_res;
+}
+
+
+
+static ADL_RESULT set_size_file_v1(ADL_FILE_DESC fd,u64 size)
+{
+	return truncate_file_v1(fd,size);
+}
+
+
+
+static ADL_RESULT set_size_file_v2(const char *name,u64 size)
+{
+	return truncate_file_v2(name,size);
+}
+
+
+
+static ADL_RESULT close_file_v1(ADL_FILE_DESC fd)
+{
+#ifdef ADL_OS_UNIX
+	u64 desc = fd.fd;
+	return file_linux.close(desc);
+#else
+#ifdef ADL_OS_WINDOWS
+
+#endif
+#endif
+}
+
+
+bool check_error_file(ADL_RESULT res)
+{
+	return ADL_RESULT_CHECK_ERROR(res);
+}
+
+
+
+bool print_error_file(ADL_RESULT res)
+{
+	if(ADL_CHECK_NULL(res.str.str))
+	{
+		ADL_RETURN_DEFER(null_str);
+	}
+
+	res.str.println(&res.str);
+	return true;
+
+null_str:
 	return false;
-success_call:
+}
+
+
+
+
+bool clear_error_file(ADL_RESULT res)
+{
+	ADL_RESULT_FINI(res);
 	return true;
 }
-
-
-static void clear_error_file(ADL_FILE *self)
-{
-	if(ADL_CHECK_NULL(self))
-	{
-		ADL_RETURN_DEFER(null_self);
-	}
-
-	self->error_code = 0;
-	ADL_STRING_fini(&self->error_string);
-
-null_self:
-	return;
-}
-
-
-
-
 
 
 void ADL_FILE_init(ADL_FILE *file)
@@ -809,38 +670,46 @@ void ADL_FILE_init(ADL_FILE *file)
 		ADL_RETURN_DEFER(null_file);
 	}
 
-	file->fd         	   = 0;
-	file->error_code   	   = 0;
-	file->size             = 0;
-	file->name             = (ADL_STRING){};
-	file->error_string 	   = (ADL_STRING){};
-	file->handle     	   = NULL;
-	file->bytes      	   = 0;
-	file->current_offset   = 0;
-	file->previous_offset  = 0;
 
-	file->create     	= create_file;
-	file->open       	= open_file;
-	file->read       	= read_file;
-	file->write      	= write_file;
-	file->seek          = seek_file;
-	file->pread         = pread_file;
-	file->pwrite        = pwrite_file;
-	file->truncate      = truncate_file;
-	file->rename        = rename_file;
-	file->move          = move_file;
-	file->fdatasync     = fdatasync_file;
-	file->fsync         = fsync_file;
-	file->sync          = sync_file;
-	file->stat          = stat_file;
-	file->chmod         = chmod_file;
-	file->chown         = chown_file;
-	file->lchown        = lchown_file;
-	file->get_size      = get_size_file;
-	file->set_size      = set_size_file;
-	file->close      	= close_file;
-	file->check_error	= check_error_file;
-	file->clear_error   = clear_error_file;
+	file->create_v2     	= create_file_v2;
+	file->delete_v2         = delete_file_v2;
+	file->open_v2       	= open_file_v2;
+	file->set_desc          = set_desc_file;
+	file->read_v1       	= read_file_v1;
+	file->write_v1      	= write_file_v1;
+	file->read_all_v1       = read_all_file_v1;
+	file->write_all_v1      = write_all_file_v1;
+
+	file->readv_v1          = readv_file_v1;
+	file->writev_v1         = writev_file_v1;
+	file->seek_v1           = seek_file_v1;
+	file->pread_v1          = pread_file_v1;
+	file->pwrite_v1         = pwrite_file_v1;
+	file->preadv_v1         = preadv_file_v1;
+	file->pwritev_v1        = pwritev_file_v1;
+	file->truncate_v1       = truncate_file_v1;
+	file->truncate_v2       = truncate_file_v2;
+	file->rename_v2         = rename_file_v2;
+	file->move_v2           = move_file_v2;
+	file->fdatasync_v1      = fdatasync_file_v1;
+	file->fsync_v1          = fsync_file_v1;
+	file->sync_v1           = sync_file_v1;
+	file->stat_v1           = stat_file_v1;
+	file->stat_v2           = stat_file_v2;
+	file->stat_v3           = stat_file_v3;
+	file->chmod_v1          = chmod_file_v1;
+	file->chmod_v2          = chmod_file_v2;
+	file->chown_v1          = chown_file_v1;
+	file->chown_v2          = chown_file_v2;
+	file->chown_v3          = chown_file_v3;
+	file->get_size_v1       = get_size_file_v1;
+	file->get_size_v2       = get_size_file_v2;
+	file->set_size_v1       = set_size_file_v1;
+	file->set_size_v2       = set_size_file_v2;
+	file->close_v1      	= close_file_v1;
+	file->check_error       = check_error_file;
+	file->print_error       = print_error_file;
+	file->clear_error       = clear_error_file;
 
 null_file:
 	return;
@@ -855,6 +724,8 @@ void ADL_FILE_fini(ADL_FILE *file)
 	{
 		ADL_RETURN_DEFER(null_file);
 	}
+
+	ADL_MEMSET(file,0,sizeof(ADL_FILE));
 
 null_file:
 	return;

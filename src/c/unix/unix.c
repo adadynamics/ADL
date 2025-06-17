@@ -2020,11 +2020,11 @@ static ADL_RESULT adl_sys_ftruncate(int fd,off_t length)
 
 /*
 
-static ADL_RESULT adl_sys_getcwd(char *buf,size_t bufsize)
+static ADL_RESULT adl_sys_getcwd(char *buf,size_t buf_size)
 
             a wrapper for the getcwd system call on unix systems
 
-            INPUT  :(char *buf,size_t bufsize)
+            INPUT  :(char *buf,size_t buf_size)
 
             OUTPUT : returns a ADL_RESULT structure
 
@@ -2039,10 +2039,10 @@ static ADL_RESULT adl_sys_getcwd(char *buf,size_t bufsize)
 
 ___adl_ret_charptr___
 
-static ADL_RESULT adl_sys_getcwd(char *buf,size_t bufsize)
+static ADL_RESULT adl_sys_getcwd(char *buf,size_t buf_size)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
-    rdr_retptr = ADL_GETCWD(buf,bufsize);
+    rdr_retptr = ADL_GETCWD(buf,buf_size);
     if(ADL_CHECK_NULL(rdr_retptr))
     {
         rdr_ret = -1;
@@ -2496,11 +2496,11 @@ static ADL_RESULT adl_sys_symlinkat(const char *target,int newdirfd,const char *
 
 /*
 
-static ADL_RESULT adl_sys_readlink(const char *path,char *buf,size_t bufsize)
+static ADL_RESULT adl_sys_readlink(const char *path,char *buf,size_t buf_size)
 
             a wrapper for the readlink system call on unix systems
 
-            INPUT  :(const char *path,char *buf,size_t bufsize)
+            INPUT  :(const char *path,char *buf,size_t buf_size)
 
             OUTPUT : returns a ADL_RESULT structure
 
@@ -2514,10 +2514,10 @@ static ADL_RESULT adl_sys_readlink(const char *path,char *buf,size_t bufsize)
 */
 
 
-static ADL_RESULT adl_sys_readlink(const char *path,char *buf,size_t bufsize)
+static ADL_RESULT adl_sys_readlink(const char *path,char *buf,size_t buf_size)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
-    rdr_ret = ADL_READLINK(path,buf,bufsize);
+    rdr_ret = ADL_READLINK(path,buf,buf_size);
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -2527,11 +2527,11 @@ static ADL_RESULT adl_sys_readlink(const char *path,char *buf,size_t bufsize)
 
 /*
 
-static ADL_RESULT adl_sys_readlinkat(int dirfd,const char *path,char *buf,size_t bufsize)
+static ADL_RESULT adl_sys_readlinkat(int dirfd,const char *path,char *buf,size_t buf_size)
 
             a wrapper for the readlinkat system call on unix systems
 
-            INPUT  :(int dirfd,const char *path,char *buf,size_t bufsize)
+            INPUT  :(int dirfd,const char *path,char *buf,size_t buf_size)
 
             OUTPUT : returns a ADL_RESULT structure
 
@@ -2545,10 +2545,10 @@ static ADL_RESULT adl_sys_readlinkat(int dirfd,const char *path,char *buf,size_t
 */
 
 
-static ADL_RESULT adl_sys_readlinkat(int dirfd,const char *path,char *buf,size_t bufsize)
+static ADL_RESULT adl_sys_readlinkat(int dirfd,const char *path,char *buf,size_t buf_size)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
-    rdr_ret = ADL_READLINKAT(dirfd,path,buf,bufsize);
+    rdr_ret = ADL_READLINKAT(dirfd,path,buf,buf_size);
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 

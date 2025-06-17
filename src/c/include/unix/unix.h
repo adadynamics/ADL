@@ -168,7 +168,7 @@ typedef struct ADL_UNIX
     ADL_RESULT (*fdatasync)(int fd);
     ADL_RESULT (*truncate)(const char *path,off_t length);
     ADL_RESULT (*ftruncate)(int fd,off_t length);
-    ADL_RESULT (*getcwd)(char *buf,size_t bufsize);
+    ADL_RESULT (*getcwd)(char *buf,size_t buf_size);
     ADL_RESULT (*chdir)(const char *path);
     ADL_RESULT (*fchdir)(int fd);
     ADL_RESULT (*rename)(const char *oldpath,const char *newpath);
@@ -183,8 +183,8 @@ typedef struct ADL_UNIX
     ADL_RESULT (*unlinkat)(int dirfd,const char *path,int flags);
     ADL_RESULT (*symlink)(const char *target,const char *linkpath);
     ADL_RESULT (*symlinkat)(const char *target,int newdirfd,const char *linkpath);
-    ADL_RESULT (*readlink)(const char *path,char *buf,size_t bufsize);
-    ADL_RESULT (*readlinkat)(int dirfd,const char *path,char *buf,size_t bufsize);
+    ADL_RESULT (*readlink)(const char *path,char *buf,size_t buf_size);
+    ADL_RESULT (*readlinkat)(int dirfd,const char *path,char *buf,size_t buf_size);
     ADL_RESULT (*chmod)(const char *path,mode_t mode);
     ADL_RESULT (*fchmod)(int fd,mode_t mode);
     ADL_RESULT (*fchmodat)(int dirfd,const char *path,mode_t mode,int flags);
@@ -266,6 +266,8 @@ typedef struct ADL_UNIX
     ADL_RESULT (*rewinddir)(DIR *dirp);
     ADL_RESULT (*closedir)(DIR *dirp);
     ADL_RESULT (*dirfd)(DIR *dirp);
+
+
     ADL_RESULT (*pause)(void);
     ADL_RESULT (*nanosleep)(const struct timespec *duration,struct timespec *remaining);
     ADL_RESULT (*getitimer)(int which,struct itimerval *current);

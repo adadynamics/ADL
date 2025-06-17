@@ -2,21 +2,17 @@
 #define ADL_OS_H
 
 #define ADL_OS_UNIX
-#if defined(ADL_OS_UNIX)
+
+//#if defined(ADL_OS_UNIX)
 
 #include "../include/unix/unix.h"
+
+
+/*
 #include <linux/if.h>
 
 
 typedef struct iovec ADL_IOVEC;
-
-#ifndef ADL_UNIX_BEGIN
-#define ADL_UNIX_BEGIN #ifdef ADL_OS_UNIX
-#endif
-
-#ifndef ADL_UNIX_END
-#define ADL_UNIX_END #endif
-#endif
 
 #else
 #if defined(ADL_OS_WINDOWS)
@@ -64,9 +60,10 @@ typedef struct ADL_STAT
 	#define st_ctime st_ctim.tv_sec
 
 }ADL_STAT;
+*/
 
 
-
+extern ADL_UNIX adl_os;
 void ADL_Os_library_init();
 
 #endif

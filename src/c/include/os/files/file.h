@@ -3,57 +3,75 @@
 
 #include "../os.h"
 
-typedef struct ADL_FILEARGS
+
+
+
+typedef struct ADL_FILE_ARGS
 {
 	u64 flags;
 	u64 mode;
 	u32 uid;
 	u32 gid;
-}ADL_FILEARGS;
+}ADL_FILE_ARGS;
+
+
+
+
+typedef struct ADL_FILE_DESC
+{
+	s64 fd;
+	void *handle;
+}ADL_FILE_DESC;
+
+
+#ifndef ADL_FILE_DESC_INIT
+#define ADL_FILE_DESC_INIT(id)  ADL_FILE_DESC id = (ADL_FILE_DESC){.fd = -1,.handle = NULL}
+#endif
+
+
 
 
 typedef struct ADL_FILE
 {
-	u64 fd;
-	void_ptr handle;
-	u64 size;
-	u64 bytes;
-	s64 current_offset;
-	s64 previous_offset;
-	u64 error_code;
-	ADL_STRING error_string;
-	ADL_STRING name;
-
-	void (*create)(struct ADL_FILE *self,const char *name,ADL_FILEARGS args);
-	void (*open)(struct ADL_FILE *self,const char *name,ADL_FILEARGS args);
-	void (*read)(struct ADL_FILE *self,void_ptr buf,u64 buf_size);
-	void (*write)(struct ADL_FILE *self,const void_ptr buf,u64 buf_size);/**
-	void (*readv)(struct ADL_FILE *self,const ADL_IOVEC *iov,u64 count);
-	void (*writev)(struct ADL_FILE *self,const ADL_IOVEC *iov,u64 count);*/
-	void (*seek)(struct ADL_FILE *self,s64 offset,u64 whence);
-	void (*pread)(struct ADL_FILE *self,void_ptr buf,u64 bufsize,u64 offset);
-	void (*pwrite)(struct ADL_FILE *self,const void_ptr buf,u64 bufsize,u64 offset);/*
-	void (*preadv)(struct ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset);
-	void (*pwritev)(struct ADL_FILE *self,const ADL_IOVEC *iov,u64 count,u64 offset);*/
-	void (*truncate)(struct ADL_FILE *self,u64 size);
-	void (*rename)(struct ADL_FILE *self,const char *name);
-	void (*move)(struct ADL_FILE *self,const char *path);/**
-	void (*copy_from_name)(struct ADL_FILE *self,const char *src);
-	void (*copy_from)(struct ADL_FILE *self,struct ADL_FILE *src);
-	void (*copy_to_name)(struct ADL_FILE *self,const char *dst);
-	void (*copy_to)(struct ADL_FILE *self,struct ADL_FILE *dst);*/
-	void (*fdatasync)(struct ADL_FILE *self);
-	void (*fsync)(struct ADL_FILE *self);
-	void (*sync)(struct ADL_FILE *self);
-	void (*stat)(struct ADL_FILE *self,ADL_STAT *buf);
-	void (*chmod)(struct ADL_FILE *self,ADL_FILEARGS);
-	void (*chown)(struct ADL_FILE *self,ADL_FILEARGS args);
-	void (*lchown)(struct ADL_FILE *self,ADL_FILEARGS args);
-	u64 (*get_size)(struct ADL_FILE *self);
-	void (*set_size)(struct ADL_FILE *self,u64 size);
-	void (*close)(struct ADL_FILE *self);
-	bool (*check_error)(struct ADL_FILE *self);
-	void (*clear_error)(struct ADL_FILE *self);
+	ADL_RESULT (*create_v2)(const char *name,ADL_FILE_ARGS args);
+	ADL_RESULT (*delete_v2)(const char *name);
+	ADL_RESULT (*open_v2)(const char *name,ADL_FILE_ARGS args);
+	ADL_RESULT (*set_desc)(ADL_FILE_DESC *desc,ADL_RESULT res);
+	ADL_RESULT (*read_v1)(ADL_FILE_DESC fd,void_ptr buf,u64 buf_size);
+	ADL_RESULT (*write_v1)(ADL_FILE_DESC fd,const void_ptr buf,u64 buf_size);
+	ADL_RESULT (*read_all_v1)(ADL_FILE_DESC fd,void_ptr buf,u64 buf_size);
+	ADL_RESULT (*write_all_v1)(ADL_FILE_DESC fd,const void_ptr buf,u64 buf_size);
+	
+	ADL_RESULT (*readv_v1)(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count);
+	ADL_RESULT (*writev_v1)(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count);
+	ADL_RESULT (*seek_v1)(ADL_FILE_DESC fd,s64 offset,u64 whence);
+	ADL_RESULT (*pread_v1)(ADL_FILE_DESC fd,void_ptr buf,u64 buf_size,u64 offset);
+	ADL_RESULT (*pwrite_v1)(ADL_FILE_DESC fd,const void_ptr buf,u64 buf_size,u64 offset);
+	ADL_RESULT (*preadv_v1)(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count,u64 offset);
+	ADL_RESULT (*pwritev_v1)(ADL_FILE_DESC fd,const ADL_IOVEC *iov,u64 count,u64 offset);
+	ADL_RESULT (*truncate_v1)(ADL_FILE_DESC fd,u64 size);
+	ADL_RESULT (*truncate_v2)(const char *name,u64 size);
+	ADL_RESULT (*rename_v2)(const char *oldname,const char *newname);
+	ADL_RESULT (*move_v2)(const char *oldname,const char *newname);
+	ADL_RESULT (*fdatasync_v1)(ADL_FILE_DESC fd);
+	ADL_RESULT (*fsync_v1)(ADL_FILE_DESC fd);
+	ADL_RESULT (*sync_v1)(void);
+	ADL_RESULT (*stat_v1)(ADL_FILE_DESC fd,ADL_STAT *buf);
+	ADL_RESULT (*stat_v2)(const char *name,ADL_STAT *buf);
+	ADL_RESULT (*stat_v3)(const char *name,ADL_STAT *buf);
+	ADL_RESULT (*chmod_v1)(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+	ADL_RESULT (*chmod_v2)(const char *name,ADL_FILE_ARGS args);
+	ADL_RESULT (*chown_v1)(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+	ADL_RESULT (*chown_v2)(const char *name,ADL_FILE_ARGS args);
+	ADL_RESULT (*chown_v3)(const char *name,ADL_FILE_ARGS args);
+	ADL_RESULT (*get_size_v1)(ADL_FILE_DESC fd);
+	ADL_RESULT (*get_size_v2)(const char *name);
+	ADL_RESULT (*set_size_v1)(ADL_FILE_DESC fd,u64 size);
+	ADL_RESULT (*set_size_v2)(const char *name,u64 size);
+	ADL_RESULT (*close_v1)(ADL_FILE_DESC fd);
+	bool (*check_error)(ADL_RESULT res);
+	bool (*print_error)(ADL_RESULT res);
+	bool (*clear_error)(ADL_RESULT res);
 }ADL_FILE;
 
 

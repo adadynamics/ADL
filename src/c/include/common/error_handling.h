@@ -24,7 +24,7 @@ typedef struct ADL_RESULT
 
 
 #ifndef ADL_RESULT_FINI
-#define ADL_RESULT_FINI(id)  (id).code = 0; (id).ptr = NULL; ADL_STRING_fini(&(id).str)
+#define ADL_RESULT_FINI(id)  (id)._errno = 0; (id).code = 0; (id).ptr = NULL; ADL_STRING_fini(&(id).str)
 #endif
 
 
