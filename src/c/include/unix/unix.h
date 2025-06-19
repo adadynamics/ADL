@@ -486,13 +486,9 @@ typedef struct ADL_UNIX
     ADL_RESULT (*pthread_setschedparam)(pthread_t thread,int policy,const struct sched_param *param);
     ADL_RESULT (*pthread_cancel)(pthread_t thread);
     ADL_RESULT (*pthread_setschedprio)(pthread_t thread,int prio);
-    ADL_RESULT (*pthread_cleanup_pop)(int execute);
     ADL_RESULT (*pthread_sigmask)(int how,const sigset_t *set,sigset_t *oldset);
-    ADL_RESULT (*pthread_cleanup_pop_restore_np)(int execute);
     ADL_RESULT (*pthread_sigqueue)(pthread_t thread,int sig,const union sigval value);
-    ADL_RESULT (*pthread_cleanup_push)(void (*routine)(void *),void *arg);
     ADL_RESULT (*pthread_spin_destroy)(pthread_spinlock_t *lock);
-    ADL_RESULT (*pthread_cleanup_push_defer_np)(void (*routine)(void *),void *arg);
     ADL_RESULT (*pthread_spin_init)(pthread_spinlock_t *lock,int pshared);
     ADL_RESULT (*pthread_create)(pthread_t *restrict thread,const pthread_attr_t *restrict attr,void *(*start_routine)(void *),void *restrict arg);
     ADL_RESULT (*pthread_spin_lock)(pthread_spinlock_t *lock);

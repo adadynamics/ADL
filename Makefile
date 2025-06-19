@@ -8,7 +8,7 @@ LINK= -ladl -lkeyutils -lnuma -lc -lm
 
 CC = gcc
 
-OBJECTS = $(OBJ)/string.o $(OBJ)/unix.o $(OBJ)/socket.o $(OBJ)/os.o $(OBJ)/raw.o $(OBJ)/file_linux.o  $(OBJ)/file.o $(OBJ)/directory.o
+OBJECTS = $(OBJ)/string.o $(OBJ)/unix.o $(OBJ)/socket.o $(OBJ)/os.o $(OBJ)/raw.o $(OBJ)/file_linux.o  $(OBJ)/file.o $(OBJ)/directory.o $(OBJ)/pthread_linux.o $(OBJ)/thread.o $(OBJ)/os.o
 ADL_LIB = $(TARGET)/libadl.a
 
 install: $(ADL_LIB)
@@ -19,6 +19,17 @@ install: $(ADL_LIB)
 
 $(ADL_LIB): $(OBJECTS)
 	ar -rv $@ $^
+
+
+
+$(OBJ)/os.o   : $(SRC_C)/os/os.c
+	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
+
+$(OBJ)/thread.o   : $(SRC_C)/os/thread/thread.c
+	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
+
+$(OBJ)/pthread_linux.o   : $(SRC_C)/os/thread/pthread_linux.c
+	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
 
 $(OBJ)/directory.o   : $(SRC_C)/os/file/directory.c
 	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
@@ -41,9 +52,6 @@ $(OBJ)/string.o: $(SRC_C)/ds/string.c
 	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
 
 $(OBJ)/unix.o: $(SRC_C)/unix/unix.c
-	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
-
-$(OBJ)/os.o: $(SRC_C)/os/os.c
 	$(CC) $(FLAGS) -D _GNU_SOURCE -c $< -o $@
 
 clean:
