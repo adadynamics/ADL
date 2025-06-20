@@ -6599,7 +6599,7 @@ ___adl_end_linux___
 
 /*
 
-void adl_sys_exit(int status)
+static ADL_RESULT adl_sys_exit(int status)
 
             a wrapper for exit system call on unix systems
 
@@ -6617,9 +6617,11 @@ void adl_sys_exit(int status)
 */
 
 
-void adl_sys_exit(int status)
+static ADL_RESULT adl_sys_exit(int status)
 {
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
     ADL_EXIT(status);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -6627,7 +6629,7 @@ void adl_sys_exit(int status)
 
 /*
 
-void adl_sys_exit_group(int status)
+static ADL_RESULT adl_sys_exit_group(int status)
 
             a wrapper for exit_group system call on unix systems
 
@@ -6648,9 +6650,11 @@ ___adl_linux_std___
 
 ___adl_syscall___
 
-void adl_sys_exit_group(int status)
+static ADL_RESULT adl_sys_exit_group(int status)
 {
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
     ADL_EXIT_GROUP(status);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
 ___adl_end_syscall___
@@ -7978,6 +7982,18 @@ static ADL_RESULT adl_sys_setgroups(size_t size,const gid_t *list)
 
 
 
+
+static ADL_RESULT adl_lib_initgroups(const char *user,gid_t group)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_INITGROUPS(user,group);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
 /*
 
 static ADL_RESULT adl_sys_setns(int fd,int nstype)
@@ -8357,6 +8373,22 @@ static ADL_RESULT adl_sys_setuid(uid_t uid)
 
 
 
+static ADL_RESULT adl_sys_seteuid(uid_t uid)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_SETEUID(uid);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+static ADL_RESULT adl_sys_setegid(gid_t gid)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_SETEGID(gid);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
 
 
 /*
@@ -8419,6 +8451,41 @@ static ADL_RESULT adl_sys_unshare(int flags)
 }
 
 ___adl_end_linux___
+
+
+
+
+
+static ADL_RESULT adl_sys_wait(int *status)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_WAIT(status);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+static ADL_RESULT adl_sys_waitpid(pid_t pid,int *status,int options)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_WAITPID(pid,status,options);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+static ADL_RESULT adl_sys_waitid(idtype_t idtype,id_t id,siginfo_t *info,int options)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_WAITID(idtype,id,info,options);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
 
 
 
@@ -8616,8 +8683,161 @@ ___adl_end_linux___
 
 
 
+/*
+
+static ADL_RESULT adl_sys_kcmp(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+
+            a wrapper for kcmp system call on unix systems
+
+            INPUT  :(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+            
+            OUTPUT : returns a ADL_RESULT structure
+
+            ****
+                on success the ret member of the structure is set to zero
+
+                on error the ret member of the structure is set to -1, the _errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
 
 
+
+static ADL_RESULT adl_lib_getenv(const char *name)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_retptr = ADL_GETENV(name);
+    if(ADL_CHECK_NULL(rdr_retptr))
+    {
+        rdr_ret = -1;
+    }
+
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+/*
+
+static ADL_RESULT adl_sys_kcmp(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+
+            a wrapper for kcmp system call on unix systems
+
+            INPUT  :(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+            
+            OUTPUT : returns a ADL_RESULT structure
+
+            ****
+                on success the ret member of the structure is set to zero
+
+                on error the ret member of the structure is set to -1, the _errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+
+static ADL_RESULT adl_lib_setenv(const char *name,const char *value,int overwrite)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_SETENV(name,value,overwrite);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+/*
+
+static ADL_RESULT adl_sys_kcmp(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+
+            a wrapper for kcmp system call on unix systems
+
+            INPUT  :(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+            
+            OUTPUT : returns a ADL_RESULT structure
+
+            ****
+                on success the ret member of the structure is set to zero
+
+                on error the ret member of the structure is set to -1, the _errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+static ADL_RESULT adl_lib_unsetenv(const char *name)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_UNSETENV(name);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+/*
+
+static ADL_RESULT adl_sys_kcmp(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+
+            a wrapper for kcmp system call on unix systems
+
+            INPUT  :(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2)
+            
+            OUTPUT : returns a ADL_RESULT structure
+
+            ****
+                on success the ret member of the structure is set to zero
+
+                on error the ret member of the structure is set to -1, the _errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+
+static ADL_RESULT adl_lib_clearenv(void)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_CLEARENV();
+    if(ADL_CHECK_NOT_EQUAL(rdr_ret,0))
+    {
+        rdr_ret = -1;
+    }
+
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+
+static ADL_RESULT adl_sys_times(struct tms *buf)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_TIMES(buf);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+
+static ADL_RESULT adl_sys_acct(const char *acctfile)
+{
+    ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_ACCT(acctfile);
+    ADL_UNIX_FINI(rdr_ret,rdr_retptr);
+}
 
 
 
@@ -13356,6 +13576,9 @@ void ADL_UNIX_init(ADL_UNIX *adl_unix)
     adl_unix->futex                                           = adl_sys_futex;
     adl_unix->set_robust_list                                 = adl_sys_set_robust_list;
     adl_unix->get_robust_list                                 = adl_sys_get_robust_list;
+
+
+
     adl_unix->capget                                          = adl_sys_capget;
     adl_unix->capset                                          = adl_sys_capset;
     adl_unix->clone3                                          = adl_sys_clone3;
@@ -13406,6 +13629,7 @@ void ADL_UNIX_init(ADL_UNIX *adl_unix)
     adl_unix->sched_yield                                     = adl_sys_sched_yield;
     adl_unix->setgid                                          = adl_sys_setgid;
     adl_unix->setgroups                                       = adl_sys_setgroups;
+    adl_unix->initgroups                                      = adl_lib_initgroups;
     adl_unix->setns                                           = adl_sys_setns;
     adl_unix->setpgid                                         = adl_sys_setpgid;
     adl_unix->setpriority                                     = adl_sys_setpriority;
@@ -13418,14 +13642,27 @@ void ADL_UNIX_init(ADL_UNIX *adl_unix)
     adl_unix->set_thread_area                                 = adl_sys_set_thread_area;
     adl_unix->set_tid_address                                 = adl_sys_set_tid_address;
     adl_unix->setuid                                          = adl_sys_setuid;
+    adl_unix->seteuid                                         = adl_sys_seteuid;
+    adl_unix->setegid                                         = adl_sys_setegid;
     adl_unix->tgkill                                          = adl_sys_tgkill;
     adl_unix->unshare                                         = adl_sys_unshare;
+    adl_unix->wait                                            = adl_sys_wait;
+    adl_unix->waitpid                                         = adl_sys_waitpid;
+    adl_unix->waitid                                          = adl_sys_waitid;
     adl_unix->wait4                                           = adl_sys_wait4;
     adl_unix->wait3                                           = adl_sys_wait3;
     adl_unix->bpf                                             = adl_sys_bpf;
     adl_unix->modify_ldt                                      = adl_sys_modify_ldt;
     adl_unix->seccomp                                         = adl_sys_seccomp;
     adl_unix->kcmp                                            = adl_sys_kcmp;
+    adl_unix->getenv                                          = adl_lib_getenv;
+    adl_unix->setenv                                          = adl_lib_setenv;
+    adl_unix->unsetenv                                        = adl_lib_unsetenv;
+    adl_unix->clearenv                                        = adl_lib_clearenv;
+    adl_unix->times                                           = adl_sys_times;
+    adl_unix->acct                                            = adl_sys_acct;
+
+
     adl_unix->sigaction                                       = adl_sys_sigaction;
     adl_unix->sigpending                                      = adl_sys_sigpending;
     adl_unix->sigprocmask                                     = adl_sys_sigprocmask;

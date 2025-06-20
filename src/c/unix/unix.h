@@ -1273,6 +1273,16 @@ ___adl_syscall___
 
 
 
+
+
+
+
+
+
+
+
+
+
 #ifndef ADL_CAPGET
 #define ADL_CAPGET capget
 #endif
@@ -1521,6 +1531,12 @@ ___adl_end_linux___
 #define ADL_SETGROUPS setgroups
 #endif
 
+
+#ifndef ADL_INITGROUPS
+#define ADL_INITGROUPS initgroups
+#endif
+
+
 ___adl_linux_std___
 
 #ifndef ADL_SETNS
@@ -1580,6 +1596,20 @@ ___adl_end_linux___
 #define ADL_SETUID setuid
 #endif
 
+
+
+#ifndef ADL_SETEUID
+#define ADL_SETEUID seteuid
+#endif
+
+
+
+#ifndef ADL_SETEGID
+#define ADL_SETEGID setegid
+#endif
+
+
+
 ___adl_linux_std___
 
 #ifndef ADL_TGKILL
@@ -1593,6 +1623,20 @@ ___adl_linux_std___
 
 ___adl_end_linux___
 
+#ifndef ADL_WAIT
+#define ADL_WAIT wait
+#endif
+
+
+#ifndef ADL_WAITPID
+#define ADL_WAITPID waitpid
+#endif
+
+#ifndef ADL_WAITID
+#define ADL_WAITID waitid
+#endif
+
+
 #ifndef ADL_WAIT4
 #define ADL_WAIT4 wait4
 #endif
@@ -1600,6 +1644,7 @@ ___adl_end_linux___
 #ifndef ADL_WAIT3
 #define ADL_WAIT3 wait3
 #endif
+
 
 ___adl_linux_std___
 
@@ -1623,6 +1668,42 @@ ___adl_syscall___
 
 ___adl_end_syscall___
 ___adl_end_linux___
+
+
+#ifndef ADL_GETENV
+#define ADL_GETENV getenv
+#endif
+
+
+
+#ifndef ADL_SETENV
+#define ADL_SETENV setenv
+#endif
+
+
+#ifndef ADL_UNSETENV
+#define ADL_UNSETENV unsetenv
+#endif
+
+
+#ifndef ADL_CLEARENV
+#define ADL_CLEARENV clearenv
+#endif
+
+
+
+#ifndef ADL_TIMES 
+#define ADL_TIMES times
+#endif
+
+
+#ifndef ADL_ACCT
+#define ADL_ACCT acct
+#endif
+
+
+
+
 
 
 
@@ -2480,14 +2561,17 @@ static ADL_RESULT adl_sys_semctl(int id, int num,int op,...);
 static ADL_RESULT adl_sys_futex(uint32_t *uaddr, int futex_op, uint32_t val,const struct timespec *timeout,uint32_t *uaddr2, uint32_t val3);
 static ADL_RESULT adl_sys_set_robust_list(struct robust_list_head *head,size_t len);
 static ADL_RESULT adl_sys_get_robust_list(int pid,struct robust_list_head **head, size_t *len);
+
+
+
 static ADL_RESULT adl_sys_capget(cap_user_header_t hdrp,cap_user_data_t datap);
 static ADL_RESULT adl_sys_capset(cap_user_header_t hdrp,const cap_user_data_t datap);
 static ADL_RESULT adl_sys_clone3(struct clone_args *cl_args,size_t size);
 static ADL_RESULT adl_sys_clone(int (*fn)(void *),void *stack,int flags,void *arg,pid_t *parent_tid,void *tls,pid_t *child_tid);
 static ADL_RESULT adl_sys_execve(const char *pathname, char *const argv[],char *const envp[]);
 static ADL_RESULT adl_sys_execveat(int dirfd,const char *pathname, char *const argv[],char *const envp[],int flags);
-static void adl_sys_exit(int status);
-static void adl_sys_exit_group(int status);
+static ADL_RESULT adl_sys_exit(int status);
+static ADL_RESULT adl_sys_exit_group(int status);
 static ADL_RESULT adl_sys_fork();
 static ADL_RESULT adl_sys_vfork();
 static ADL_RESULT adl_sys_getcpu(unsigned int *cpu,unsigned int *node);
@@ -2530,6 +2614,7 @@ static ADL_RESULT adl_sys_sched_setscheduler(pid_t pid, int policy,const struct 
 static ADL_RESULT adl_sys_sched_yield();
 static ADL_RESULT adl_sys_setgid(gid_t gid);
 static ADL_RESULT adl_sys_setgroups(size_t size,const gid_t *list);
+static ADL_RESULT adl_lib_initgroups(const char *user,gid_t group);
 static ADL_RESULT adl_sys_setns(int fd,int nstype);
 static ADL_RESULT adl_sys_setpgid(pid_t pid, pid_t pgid);
 static ADL_RESULT adl_sys_setpriority(int which, id_t who, int prio);
@@ -2542,14 +2627,29 @@ static ADL_RESULT adl_sys_setsid(void);
 static ADL_RESULT adl_sys_set_thread_area(struct user_desc *u_info);
 static ADL_RESULT adl_sys_set_tid_address(int *tidptr);
 static ADL_RESULT adl_sys_setuid(uid_t uid);
+static ADL_RESULT adl_sys_seteuid(uid_t uid);
+static ADL_RESULT adl_sys_setegid(gid_t gid);
 static ADL_RESULT adl_sys_tgkill(pid_t tgid,pid_t tid,int sig);
 static ADL_RESULT adl_sys_unshare(int flags);
+static ADL_RESULT adl_sys_wait(int *status);
+static ADL_RESULT adl_sys_waitpid(pid_t pid,int *status,int options);
+static ADL_RESULT adl_sys_waitid(idtype_t idtype,id_t id,siginfo_t *info,int options);
 static ADL_RESULT adl_sys_wait4(pid_t pid,int *wstatus,int options,struct rusage *rusage);
 static ADL_RESULT adl_sys_wait3(int *wstatus,int options,struct rusage *rusage);
 static ADL_RESULT adl_sys_bpf(int cmd,union bpf_attr *attr,unsigned int size);
 static ADL_RESULT adl_sys_modify_ldt(int func,void *ptr,unsigned long bytecount);
 static ADL_RESULT adl_sys_seccomp(unsigned int operation,unsigned int flags,void *args);
 static ADL_RESULT adl_sys_kcmp(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2);
+static ADL_RESULT adl_lib_getenv(const char *name);
+static ADL_RESULT adl_lib_setenv(const char *name,const char *value,int overwrite);
+static ADL_RESULT adl_lib_unsetenv(const char *name);
+static ADL_RESULT adl_lib_clearenv(void);
+static ADL_RESULT adl_sys_times(struct tms *buf);
+static ADL_RESULT adl_sys_acct(const char *acctfile);
+
+
+
+
 static ADL_RESULT adl_sys_sigaction(int signum,const struct sigaction *newact,struct sigaction *oldact);
 static ADL_RESULT adl_sys_sigpending(sigset_t *set);
 static ADL_RESULT adl_sys_sigprocmask(int how,const sigset_t *newset,sigset_t *oldset);

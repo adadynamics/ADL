@@ -31,6 +31,7 @@
 #include <linux/ioprio.h>
 #include <sys/inotify.h>
 #include <sys/quota.h>
+#include <sys/times.h>
 #include <pthread.h>
 
 #ifdef ADL_XFS_XQM_H
@@ -313,14 +314,17 @@ typedef struct ADL_UNIX
     ADL_RESULT (*futex)(uint32_t *uaddr, int futex_op, uint32_t val,const struct timespec *timeout,uint32_t *uaddr2, uint32_t val3);
     ADL_RESULT (*set_robust_list)(struct robust_list_head *head,size_t len);
     ADL_RESULT (*get_robust_list)(int pid,struct robust_list_head **head, size_t *len);
+
+
+
     ADL_RESULT (*capget)(cap_user_header_t hdrp,cap_user_data_t datap);
     ADL_RESULT (*capset)(cap_user_header_t hdrp,const cap_user_data_t datap);
     ADL_RESULT (*clone3)(struct clone_args *cl_args,size_t size);
     ADL_RESULT (*clone)(int (*fn)(void *),void *stack,int flags,void *arg,pid_t *parent_tid,void *tls,pid_t *child_tid);
     ADL_RESULT (*execve)(const char *pathname, char *const argv[],char *const envp[]);
     ADL_RESULT (*execveat)(int dirfd,const char *pathname, char *const argv[],char *const envp[],int flags);
-    void (*exit)(int status);
-    void (*exit_group)(int status);
+    ADL_RESULT (*exit)(int status);
+    ADL_RESULT (*exit_group)(int status);
     ADL_RESULT (*fork)();
     ADL_RESULT (*vfork)();
     ADL_RESULT (*getcpu)(unsigned int *cpu,unsigned int *node);
@@ -363,6 +367,7 @@ typedef struct ADL_UNIX
     ADL_RESULT (*sched_yield)();
     ADL_RESULT (*setgid)(gid_t gid);
     ADL_RESULT (*setgroups)(size_t size,const gid_t *list);
+    ADL_RESULT (*initgroups)(const char *user,gid_t group);
     ADL_RESULT (*setns)(int fd,int nstype);
     ADL_RESULT (*setpgid)(pid_t pid, pid_t pgid);
     ADL_RESULT (*setpriority)(int which, id_t who, int prio);
@@ -375,14 +380,29 @@ typedef struct ADL_UNIX
     ADL_RESULT (*set_thread_area)(struct user_desc *u_info);
     ADL_RESULT (*set_tid_address)(int *tidptr);
     ADL_RESULT (*setuid)(uid_t uid);
+    ADL_RESULT (*seteuid)(uid_t uid);
+    ADL_RESULT (*setegid)(gid_t gid);
     ADL_RESULT (*tgkill)(pid_t tgid,pid_t tid,int sig);
     ADL_RESULT (*unshare)(int flags);
+    ADL_RESULT (*wait)(int *status);
+    ADL_RESULT (*waitpid)(pid_t pid,int *status,int options);
+    ADL_RESULT (*waitid)(idtype_t idtype,id_t id,siginfo_t *info,int options);
     ADL_RESULT (*wait4)(pid_t pid,int *wstatus,int options,struct rusage *rusage);
     ADL_RESULT (*wait3)(int *wstatus,int options,struct rusage *rusage);
     ADL_RESULT (*bpf)(int cmd,union bpf_attr *attr,unsigned int size);
     ADL_RESULT (*modify_ldt)(int func,void *ptr,unsigned long bytecount);
     ADL_RESULT (*seccomp)(unsigned int operation,unsigned int flags,void *args);
     ADL_RESULT (*kcmp)(pid_t pid1,pid_t pid2,int type,unsigned long idx1,unsigned long idx2);
+    ADL_RESULT (*getenv)(const char *name);
+    ADL_RESULT (*setenv)(const char *name,const char *value,int overwrite);
+    ADL_RESULT (*unsetenv)(const char *name);
+    ADL_RESULT (*clearenv)(void);
+    ADL_RESULT (*times)(struct tms *buf);
+    ADL_RESULT (*acct)(const char *acctfile);
+
+
+
+
     ADL_RESULT (*sigaction)(int signum,const struct sigaction *newact,struct sigaction *oldact);
     ADL_RESULT (*sigpending)(sigset_t *set);
     ADL_RESULT (*sigprocmask)(int how,const sigset_t *newset,sigset_t *oldset);
@@ -438,7 +458,6 @@ typedef struct ADL_UNIX
     ADL_RESULT (*munlock)(const void *addr,size_t len);
     ADL_RESULT (*munlockall)();
     ADL_RESULT (*munmap)(void *addr,size_t len);
-
 
 
 
