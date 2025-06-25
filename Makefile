@@ -19,29 +19,53 @@ OS_CC   = gcc
 OS_OBJ  = $(TARGET)/obj/os
 
 
-UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o 
+UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o $(OS_OBJ)/file_linux.o
 
 
+ADL_WINDOWS_LIB = $(TARGET)/libwinadl.a
 
-WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o
+WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/windows.o $(OS_OBJ)/file_windows.o 
 
+windows_install: $(ADL_WINDOWS_LIB)
+	sudo cp $(ADL_WINDOWS_LIB) /usr/i686-w64-mingw32/lib
+	sudo rm -rf /usr/i686-w64-mingw32/include/adl
+	sudo mkdir /usr/i686-w64-mingw32/include/adl 
+	sudo cp -r $(INC)/* /usr/i686-w64-mingw32/include/adl
+
+$(ADL_WINDOWS_LIB): $(WINDOWS_OBJECTS)
+	ar -rcsv $@ $^
+
+
+$(OS_OBJ)/file_windows.o: $(SRC_C)/os/file/platform/windows/file_windows.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+$(WINDOWS_OBJ)/windows.o: $(SRC_C)/windows/windows.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 $(WINDOWS_OBJ)/file.o: $(SRC_C)/windows/file/file.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
+$(WINDOWS_OBJ)/string.o: $(SRC_C)/ds/string.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+
 
 ADL_UNIX_LIB = $(TARGET)/libadl.a
 
-install: $(ADL_UNIX_LIB)
+unix_install: $(ADL_UNIX_LIB)
 	sudo cp $(ADL_UNIX_LIB) /usr/lib
 	sudo rm -rf /usr/include/adl
 	sudo mkdir /usr/include/adl 
 	sudo cp -r $(INC)/* /usr/include/adl
 
 $(ADL_UNIX_LIB): $(UNIX_OBJECTS)
-	ar -rv $@ $^
+	ar -rcsv $@ $^
 
 
+
+
+$(OS_OBJ)/file_linux.o: $(SRC_C)/os/file/platform/unix/file_linux.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
 $(UNIX_OBJ)/unix.o: $(SRC_C)/unix/unix.c
 	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@

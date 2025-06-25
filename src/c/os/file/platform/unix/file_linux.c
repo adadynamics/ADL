@@ -1,7 +1,7 @@
 #include "file_linux.h"
 
 
-
+#ifdef ADL_OS_UNIX
 
 
 void ADL_FILE_LINUX_init(ADL_FILE_LINUX *class)
@@ -175,3 +175,6 @@ void ADL_FILE_LINUX_library_init()
 {
     ADL_FILE_LINUX_init(&file_linux);
 }
+
+
+#endif

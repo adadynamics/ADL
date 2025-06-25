@@ -1,7 +1,9 @@
-#ifndef ADL_OS_FILES_FILE_LINUX_H
-#define ADL_OS_FILES_FILE_LINUX_H
+#ifndef ADL_SRC_OS_FILES_PLATFORM_UNIX_FILE_LINUX_H
+#define ADL_SRC_OS_FILES_PLATFORM_UNIX_FILE_LINUX_H
 
-#include "../os.h"
+#include "../../../os.h"
+
+#ifdef ADL_OS_UNIX
 
 
 typedef struct ADL_FILE_LINUX
@@ -149,5 +151,7 @@ void ADL_FILE_LINUX_init(ADL_FILE_LINUX *file);
 
 void ADL_FILE_LINUX_fini(ADL_FILE_LINUX *file);
 
+
+#endif
 
 #endif

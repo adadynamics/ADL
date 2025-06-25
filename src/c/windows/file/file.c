@@ -6,34 +6,6 @@
 
 
 
-#ifndef ADL_WINDOWS_INIT
-#define ADL_WINDOWS_INIT(val,valptr)    ADL_S64_INIT(val);  \
-                                        ADL_VOID_PTR_INIT(valptr); \
-                                        ADL_ERRNO_INIT();   \
-                                        ADL_RESULT_RETURN_DEFER_INIT();
-#endif
-
-
-
-
-#ifndef ADL_WINDOWS_FINI
-#define ADL_WINDOWS_FINI(val,valptr)    if(ADL_CHECK_EQUAL(val,-1))                                                                                 \
-                                        {                                                                                                           \
-                                            ADL_STRING str;                                                                                         \
-                                            ADL_STRING_Init(&str,ADL_STRERROR(errno));                                                              \
-                                            ADL_RESULT_RETURN_DEFER(failed_syscall, ADL_RESULT_WRITE(errno,val,str,valptr));                        \
-                                        }                                                                                                           \
-                                                                                                                                                    \
-                                        ADL_RESULT_RETURN_DEFER(success_syscall,ADL_RESULT_WRITE(errno,val,(ADL_STRING){},valptr));                 \
-                                                                                                                                                    \
-                                        failed_syscall:                                                                                             \
-                                        success_syscall:                                                                                            \
-                                            ADL_RESULT_RETURN_DEFER_FINI()                                
-
-#endif
-
-
-
 /*
 
     MISCELLENIOUS

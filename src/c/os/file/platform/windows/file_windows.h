@@ -1,49 +1,23 @@
-#ifndef ADL_WINDOWS_WINDOWS_H
-#define ADL_WINDOWS_WINDOWS_H
+#ifndef ADL_SRC_OS_FILES_PLATFORM_WINDOWS_FILE_WINDOWS_H
+#define ADL_SRC_OS_FILES_PLATFORM_WINDOWS_FILE_WINDOWS_H
 
-#include "../common/utils.h"
-#include "../ds/string.h"
-
-
+#include "../../../os.h"
 
 #ifdef ADL_OS_WINDOWS
 
 
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-
-
-
-
-typedef struct ADL_WINDOWS
+typedef struct ADL_FILE_WINDOWS
 {
-    /*
-
-        MISCELLENIOUS
-
-    */
 
     ADL_RESULT (*AreFileApisANSI)(void); 
     ADL_RESULT (*SetFileApisToANSI)(void);
     ADL_RESULT (*SetFileApisToOEM)(void);
     ADL_RESULT (*CancelIo)(HANDLE handle);
 
-    /*
-
-        INOTIFY)(MONITOR)
-
-    */
-
     ADL_RESULT (*FindFirstChangeNotification)(LPCTSTR name,BOOL watch_subtree,DWORD filter); 
     ADL_RESULT (*FindNextChangeNotification)(HANDLE handle);
     ADL_RESULT (*FindCloseChangeNotification)(HANDLE handle);
-
-    /*
-            MMAP FILES
-
-    */
 
     ADL_RESULT (*CreateFileMapping)(HANDLE handle,LPSECURITY_ATTRIBUTES sa,DWORD protect,DWORD size_high,DWORD size_low,LPCTSTR map_name); 
     ADL_RESULT (*OpenFileMapping)(DWORD access,BOOL inherit,LPCTSTR name);   
@@ -51,11 +25,6 @@ typedef struct ADL_WINDOWS
     ADL_RESULT (*MapViewOfFileEx)(HANDLE handle,DWORD access,DWORD offset_high,DWORD offset_low,DWORD size,LPVOID base_addr);
     ADL_RESULT (*FlushViewOfFile)(LPCVOID addr,DWORD size); 
     ADL_RESULT (*UnmapViewOfFile)(LPVOID base_addr);
-
-    /*
-            NORMAL FILES
-
-    */
 
     ADL_RESULT (*CreateFile)(LPCTSTR name,DWORD access,DWORD share_mode,LPSECURITY_ATTRIBUTES sa,DWORD create,DWORD attr_flags,HANDLE template);  
     ADL_RESULT (*ReadFile)(HANDLE handle,LPVOID buf,DWORD size,LPDWORD numread,LPOVERLAPPED overlapped);
@@ -84,12 +53,6 @@ typedef struct ADL_WINDOWS
     //ADL_RESULT (*UnlockFile)(HANDLE handle,DWORD offset_low,DWORD offset_high,DWORD unlock_low,DWORD unlock_high);
     ADL_RESULT (*UnlockFileEx)(HANDLE handle,DWORD reserved,DWORD bytes_lock_low,DWORD bytes_lock_high,LPOVERLAPPED overlapped); 
 
-    /*
-
-        FILE ATTRIBUTES
-
-    */
-
     //ADL_RESULT (*GetFileSize)(HANDLE handle,LPDWORD size_high); 
     ADL_RESULT (*GetFileSizeEx)(HANDLE handle,PLARGE_INTEGER size); 
     ADL_RESULT (*GetFileType)(HANDLE handle);
@@ -108,23 +71,11 @@ typedef struct ADL_WINDOWS
     //ADL_RESULT (*GetFileAttributesEx)();
     ADL_RESULT (*SetFileAttributes)(LPCTSTR name,DWORD attributes);
 
-    /*
-
-        CONSOLE
-
-    */
-
     ADL_RESULT (*SetConsoleMode)(HANDLE handle,DWORD mode);
     ADL_RESULT (*ReadConsole)(HANDLE handle,LPVOID buf,DWORD size,LPDWORD numread,LPVOID reserved);
     ADL_RESULT (*WriteConsole)(HANDLE handle,LPCVOID buf,DWORD size,LPDWORD numread,LPVOID reserved);
     ADL_RESULT (*FreeConsole)(void); 
     ADL_RESULT (*AllocConsole)(void); 
-
-    /*
-        
-        DIRECTORIES
-
-    */
 
     ADL_RESULT (*CreateDirectory)(LPCTSTR name,LPSECURITY_ATTRIBUTES sa); 
     ADL_RESULT (*CreateDirectoryEx)(LPCTSTR template,LPCTSTR name,LPSECURITY_ATTRIBUTES sa);
@@ -137,16 +88,13 @@ typedef struct ADL_WINDOWS
     ADL_RESULT (*FindNextFile)(HANDLE handle,LPWIN32_FIND_DATA data);
     ADL_RESULT (*FindClose)(HANDLE handle); 
 
+}ADL_FILE_WINDOWS;
 
 
 
-}ADL_WINDOWS;
+void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class);
 
-
-void ADL_WINDOWS_Init(ADL_WINDOWS *class);
-
-void ADL_WINDOWS_Fini(ADL_WINDOWS *class);
-
+void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class);
 
 #endif
 

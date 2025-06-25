@@ -2,7 +2,7 @@
 #define ADL_SRC_WINDOWS_FILE_FILE_H
 
 
-#include "../../include/windows/windows.h"
+#include "../windows.h"
 
 
 #ifdef ADL_OS_WINDOWS
@@ -440,19 +440,6 @@
 #ifndef ADL_FINDCLOSE
 #define ADL_FINDCLOSE FindClose
 #endif
-
-
-
-
-
-#define __BOOL__
-#define __HANDLE__
-#define __DWORD__
-#define __LPVOID__
-#define __UINT__
-#define __VOID__
-#define __
-
 
 
 

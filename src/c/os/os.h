@@ -1,21 +1,22 @@
 #ifndef ADL_OS_H
 #define ADL_OS_H
 
-#define ADL_OS_UNIX
+#define ADL_OS_TIMESPEC_DEFINED
 
-//#if defined(ADL_OS_UNIX)
+#include "../include/common/utils.h"
+
+#if defined(ADL_OS_UNIX)
 
 #include "../include/unix/unix.h"
 
 
-/*
-#include <linux/if.h>
-
 
 typedef struct iovec ADL_IOVEC;
 
-#else
-#if defined(ADL_OS_WINDOWS)
+
+extern ADL_UNIX adl_os;
+
+#elif defined(ADL_OS_WINDOWS)
 
 #include "../include/windows/windows.h"
 
@@ -25,7 +26,8 @@ typedef struct ADL_IOVEC
 	u64 len;
 }ADL_IOVEC;
 
-#endif
+
+extern ADL_WINDOWS adl_os; 
 
 #endif
 
@@ -43,7 +45,7 @@ typedef struct ADL_STAT
     s64 st_blksize; // blksize_t: block size for filesystem I/O
     s64 st_blocks;  // blkcnt_t: number of 512B blocks allocated
 
-#ifndef ADL_OS_UNIX
+#ifndef ADL_OS_TIMESPEC_DEFINED
     struct timespec {
         s64 tv_sec;   // time_t: seconds
         s64 tv_nsec;  // s64: nanoseconds
@@ -60,10 +62,8 @@ typedef struct ADL_STAT
 	#define st_ctime st_ctim.tv_sec
 
 }ADL_STAT;
-*/
 
 
-extern ADL_UNIX adl_os;
 void ADL_Os_library_init();
 
 #endif
