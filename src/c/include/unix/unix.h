@@ -6,6 +6,8 @@
 #include "../ds/string.h"
 
 
+#ifdef ADL_OS_UNIX
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -544,10 +546,11 @@ typedef struct ADL_UNIX
 }ADL_UNIX;
 
 
-void ADL_UNIX_init(ADL_UNIX *adl_unix);
+void ADL_UNIX_Init(ADL_UNIX *adl_unix);
 
-void ADL_UNIX_fini(ADL_UNIX *adl_unix);
+void ADL_UNIX_Fini(ADL_UNIX *adl_unix);
 
 
+#endif
 
 #endif

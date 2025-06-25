@@ -17,9 +17,9 @@ typedef struct ADL_STRING
 }ADL_STRING;
 
 
-void ADL_STRING_init(ADL_STRING *adl_str,char *str);
+void ADL_STRING_Init(ADL_STRING *adl_str,char *str);
 
-void ADL_STRING_fini(ADL_STRING *adl_str);
+void ADL_STRING_Fini(ADL_STRING *adl_str);
 
 
 

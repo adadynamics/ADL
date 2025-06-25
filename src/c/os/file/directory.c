@@ -53,7 +53,7 @@ ADL_RESULT get_current_directory(ADL_STRING buf)
         ADL_RETURN_DEFER(failed_getcwd);
     }
 
-    ADL_STRING_init(&buf,buf_tmp);
+    ADL_STRING_Init(&buf,buf_tmp);
 
 failed_getcwd:
     return rdr_res;
@@ -94,7 +94,7 @@ ADL_RESULT find_first_file_directory(const char *name,ADL_DIRECTORY_ENTRY *buf)
     dirent = (struct dirent *)ADL_RESULT_READ_PTR(rdr_res);
 
     ADL_STRING str;
-    ADL_STRING_init(&str,(char *)name);
+    ADL_STRING_Init(&str,(char *)name);
     str.append(&str,"/");
     str.append(&str,dirent->d_name);
 
@@ -106,12 +106,12 @@ ADL_RESULT find_first_file_directory(const char *name,ADL_DIRECTORY_ENTRY *buf)
         ADL_RETURN_DEFER(failed_stat);
     }
 
-    ADL_STRING_fini(&str);
+    ADL_STRING_Fini(&str);
 
     buf->inode_number = dirent->d_ino;
     buf->sb           = stat_buf;
-    ADL_STRING_init(&buf->name,dirent->d_name);
-    ADL_STRING_init(&rdr_res.str,(char *)name);
+    ADL_STRING_Init(&buf->name,dirent->d_name);
+    ADL_STRING_Init(&rdr_res.str,(char *)name);
     rdr_res.ptr = dir_ptr;
 
 failed_stat:
@@ -151,7 +151,7 @@ ADL_RESULT find_next_file_directory(ADL_DIRECTORY_DESC fd,ADL_DIRECTORY_ENTRY *b
  
 
     ADL_STRING str;
-    ADL_STRING_init(&str,fd.name.str);
+    ADL_STRING_Init(&str,fd.name.str);
     str.append(&str,"/");
     str.append(&str,dirent->d_name);
 
@@ -163,11 +163,11 @@ ADL_RESULT find_next_file_directory(ADL_DIRECTORY_DESC fd,ADL_DIRECTORY_ENTRY *b
         ADL_RETURN_DEFER(failed_stat);
     }
 
-    ADL_STRING_fini(&str);
+    ADL_STRING_Fini(&str);
 
     buf->inode_number = dirent->d_ino;
     buf->sb           = stat_buf;
-    ADL_STRING_init(&buf->name,dirent->d_name);
+    ADL_STRING_Init(&buf->name,dirent->d_name);
 
 failed_stat:
 failed_readdir:
@@ -190,7 +190,7 @@ ADL_RESULT find_close_directory(ADL_DIRECTORY_DESC fd)
 
 #ifdef ADL_OS_UNIX
     rdr_res = file_linux.closedir(fd.handle);
-    ADL_STRING_fini(&fd.name);
+    ADL_STRING_Fini(&fd.name);
 #endif
 
 null_handle:

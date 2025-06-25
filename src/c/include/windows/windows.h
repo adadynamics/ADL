@@ -14,6 +14,20 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 
+
+
+
+typedef struct ADL_WINDOWS
+{
+
+}ADL_WINDOWS;
+
+
+void ADL_WINDOWS_Init(ADL_WINDOWS *class);
+
+void ADL_WINDOWS_Fini(ADL_WINDOWS *class);
+
+
 #endif
 
 

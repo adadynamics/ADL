@@ -8,7 +8,7 @@ void adl_ds_string_println(void *self);
 
 
 
-void ADL_STRING_init(ADL_STRING *adl_str,char *str)
+void ADL_STRING_Init(ADL_STRING *adl_str,char *str)
 {
 	if(ADL_CHECK_NULL(adl_str))
 	{
@@ -39,7 +39,7 @@ null_adl_str:
 
 
 
-void ADL_STRING_fini(ADL_STRING *adl_str)
+void ADL_STRING_Fini(ADL_STRING *adl_str)
 {
 	if(ADL_CHECK_NULL(adl_str))
 	{

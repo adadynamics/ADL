@@ -2,67 +2,89 @@ INC= -I include
 SRC_C = src/c
 TARGET = target
 INC= src/c/include
-OBJ= $(TARGET)/obj
-FLAGS= -Wall -Wextra -Werror 
+UNIX_OBJ= $(TARGET)/obj/unix
+UNIX_FLAGS= -Wall -Wextra -Werror 
 LINK= -ladl -lkeyutils -lnuma -lc -lm
 
-CC = gcc #i686-w64-mingw32-gcc
+UNIX_CC = gcc 
+UNIX_DEFINES = -D _GNU_SOURCE #-D ADL_OS_UNIX 
 
-DEFINES = -D _GNU_SOURCE #-D ADL_OS_UNIX 
+WINDOWS_OBJ = $(TARGET)/obj/windows
+WINDOWS_CC = i686-w64-mingw32-gcc
+WINDOWS_DEFINES = 
+WINDOWS_FLAGS = # -Wall -Wextra -Werror 
 
-OBJECTS = $(OBJ)/string.o $(OBJ)/unix.o $(OBJ)/socket.o $(OBJ)/os.o $(OBJ)/raw.o $(OBJ)/file_linux.o  $(OBJ)/file.o $(OBJ)/directory.o $(OBJ)/pthread_linux.o $(OBJ)/thread.o $(OBJ)/process_linux.o
-ADL_LIB = $(TARGET)/libadl.a
 
-install: $(ADL_LIB)
-	sudo cp $(ADL_LIB) /usr/lib
+OS_CC   = gcc
+OS_OBJ  = $(TARGET)/obj/os
+
+
+UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o 
+
+
+
+WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o
+
+
+$(WINDOWS_OBJ)/file.o: $(SRC_C)/windows/file/file.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+
+ADL_UNIX_LIB = $(TARGET)/libadl.a
+
+install: $(ADL_UNIX_LIB)
+	sudo cp $(ADL_UNIX_LIB) /usr/lib
 	sudo rm -rf /usr/include/adl
 	sudo mkdir /usr/include/adl 
 	sudo cp -r $(INC)/* /usr/include/adl
 
-$(ADL_LIB): $(OBJECTS)
+$(ADL_UNIX_LIB): $(UNIX_OBJECTS)
 	ar -rv $@ $^
 
 
-$(OBJ)/process_linux.o   : $(SRC_C)/os/process/process_linux.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+
+$(UNIX_OBJ)/unix.o: $(SRC_C)/unix/unix.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
 
-$(OBJ)/thread.o   : $(SRC_C)/os/thread/thread.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/user.o: $(SRC_C)/unix/user/user.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
-$(OBJ)/pthread_linux.o   : $(SRC_C)/os/thread/pthread_linux.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
-
-$(OBJ)/directory.o   : $(SRC_C)/os/file/directory.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
-
-$(OBJ)/file.o   : $(SRC_C)/os/file/file.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/time.o: $(SRC_C)/unix/time/time.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
 
-$(OBJ)/file_linux.o   : $(SRC_C)/os/file/file_linux.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/thread.o: $(SRC_C)/unix/thread/thread.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
+$(UNIX_OBJ)/sys.o: $(SRC_C)/unix/sys/sys.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
-$(OBJ)/raw.o   : $(SRC_C)/os/net/raw/raw.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/signal.o: $(SRC_C)/unix/signal/signal.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
-$(OBJ)/socket.o: $(SRC_C)/os/net/socket/socket.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/process.o: $(SRC_C)/unix/process/process.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
-$(OBJ)/string.o: $(SRC_C)/ds/string.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/net.o: $(SRC_C)/unix/net/net.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
+$(UNIX_OBJ)/memory.o: $(SRC_C)/unix/memory/memory.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
-$(OBJ)/os.o   : $(SRC_C)/os/os.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/ipc.o: $(SRC_C)/unix/ipc/ipc.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
+$(UNIX_OBJ)/file.o: $(SRC_C)/unix/file/file.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
-$(OBJ)/unix.o: $(SRC_C)/unix/unix.c
-	$(CC) $(FLAGS) $(DEFINES)-c $< -o $@
+$(UNIX_OBJ)/string.o: $(SRC_C)/ds/string.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
+
 
 
 
 clean:
-	rm -rf $(OBJ)/*
-
+	rm -rf $(UNIX_OBJ)/*
+	rm -rf $(WINDOWS_OBJ)/*
+	rm -rf $(OS_OBJ)/*
