@@ -105,12 +105,21 @@ void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class)
         ADL_RETURN_DEFER(null_class);
     }
 
-    ADL_MEMSET(class,0,sizeof(ADL_FILE_LINUX));
+    ADL_MEMSET(class,0,sizeof(ADL_FILE_WINDOWS));
 
 null_class:
     return;
 }
 
+
+
+ADL_FILE_WINDOWS file_os;
+
+
+void ADL_FILE_WINDOWS_library_init()
+{
+    ADL_FILE_WINDOWS_Init(&file_os);
+}
 
 
 #endif

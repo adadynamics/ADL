@@ -3,9 +3,10 @@
 
 
 #include "../../include/os/file/file.h"
-#include "platform/file_linux.h"
-#include "platform/file_windows.h"
+#include "platform/unix/file_linux.h"
+#include "platform/windows/file_windows.h"
 
+/**
 // Core file operations
 file_handle_t file_open(const char *path, int flags, int mode);
 int file_close(file_handle_t handle);
@@ -76,10 +77,50 @@ int file_set_blocking(file_handle_t handle, int blocking);
 int file_get_times(const char *path, file_times_t *times);
 int file_set_times(const char *path, const file_times_t *times);
 
+*/
 
 
-#endif
+ADL_RESULT Open(const char *path,ADL_FILE_ARGS args);
+ADL_RESULT Close(ADL_FILE_DESC fd);
+ADL_RESULT Read(ADL_FILE_DESC fd,void *buf,u64 buf_size);
+ADL_RESULT Write(ADL_FILE_DESC fd,const void *buf,u64 buf_size);
 
+
+
+ADL_RESULT Seek(ADL_FILE_DESC fd,s64 offset,s32 origin);
+ADL_RESULT Truncate(const char *path,u64 length);
+ADL_RESULT Ftruncate(ADL_FILE_DESC fd,u64 length);
+
+
+
+ADL_RESULT Stat(const char *path,ADL_STAT *info);
+ADL_RESULT Fstat(ADL_FILE_DESC fd,ADL_STAT *info);
+ADL_RESULT Lstat(const char *path,ADL_STAT *info);
+
+
+
+ADL_RESULT Access(const char *path,ADL_FILE_ARGS args);
+ADL_RESULT Exists(const char *path);
+ADL_RESULT FileType(const char *path);
+
+
+ADL_RESULT Chmod(const char *path,ADL_FILE_ARGS args);
+ADL_RESULT Fchmod(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+ADL_RESULT Chown(const char *path,ADL_FILE_ARGS args);
+ADL_RESULT Fchown(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+ADL_RESULT Lchown(const char *path,ADL_FILE_ARGS args);
+
+
+
+ADL_RESULT HardLink(const char *linkpath,const char *targetpath,ADL_FILE_ARGS args);
+ADL_RESULT SymLink(const char *linkpath,const char *targetpath,ADL_FILE_ARGS args);
+ADL_RESULT ReadLink(const char *path,void *buf,u64 bufsize);
+
+ADL_RESULT Copy(const char *dst,const char *src,ADL_FILE_ARGS args);
+ADL_RESULT Move(const char *dst,const char *src,ADL_FILE_ARGS args);
+
+ADL_RESULT Dup(ADL_FILE_DESC fd1,ADL_FILE_DESC fd2);
+ADL_RESULT Delete(const char *path);
 
 
 #endif

@@ -15,16 +15,16 @@ WINDOWS_DEFINES =
 WINDOWS_FLAGS = # -Wall -Wextra -Werror 
 
 
-OS_CC   = gcc
+
 OS_OBJ  = $(TARGET)/obj/os
 
 
-UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o $(OS_OBJ)/file_linux.o
+UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o $(OS_OBJ)/unix_file_linux.o $(OS_OBJ)/unix_file.o
 
 
 ADL_WINDOWS_LIB = $(TARGET)/libwinadl.a
 
-WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/windows.o $(OS_OBJ)/file_windows.o 
+WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/windows.o $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o
 
 windows_install: $(ADL_WINDOWS_LIB)
 	sudo cp $(ADL_WINDOWS_LIB) /usr/i686-w64-mingw32/lib
@@ -36,7 +36,10 @@ $(ADL_WINDOWS_LIB): $(WINDOWS_OBJECTS)
 	ar -rcsv $@ $^
 
 
-$(OS_OBJ)/file_windows.o: $(SRC_C)/os/file/platform/windows/file_windows.c
+$(OS_OBJ)/windows_file.o: $(SRC_C)/os/file/file.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/windows_file_windows.o: $(SRC_C)/os/file/platform/windows/file_windows.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 $(WINDOWS_OBJ)/windows.o: $(SRC_C)/windows/windows.c
@@ -64,7 +67,10 @@ $(ADL_UNIX_LIB): $(UNIX_OBJECTS)
 
 
 
-$(OS_OBJ)/file_linux.o: $(SRC_C)/os/file/platform/unix/file_linux.c
+$(OS_OBJ)/unix_file.o: $(SRC_C)/os/file/file.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/unix_file_linux.o: $(SRC_C)/os/file/platform/unix/file_linux.c
 	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
 $(UNIX_OBJ)/unix.o: $(SRC_C)/unix/unix.c

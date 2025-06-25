@@ -168,7 +168,7 @@ null_class:
 }
 
 
-ADL_FILE_LINUX file_linux;
+ADL_FILE_LINUX file_os;
 
 
 void ADL_FILE_LINUX_library_init()

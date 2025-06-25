@@ -80,9 +80,13 @@
 
 
 
+#ifndef ADL_STRRCHR
+#define ADL_STRRCHR strrchr
+#endif
 
-
-
+#ifndef _STRICMP
+#define _STRICMP _stricmp
+#endif
 
 
 

@@ -1,9 +1,505 @@
 
 #include "file.h"
 
+#define ADL_OS_WINDOWS
+#ifdef ADL_OS_UNIX
+
+extern ADL_FILE_LINUX file_os;
+
+#elif defined(ADL_OS_WINDOWS)
+
+extern ADL_FILE_WINDOWS file_os;
+#include <windows.h>
+
+#endif
 
 
-extern ADL_FILE_LINUX file_linux;
+
+
+
+
+
+ADL_RESULT Open(const char *path,ADL_FILE_ARGS args)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.open(path,args1.flags,args.mode);
+#elif defined(ADL_OS_WINDOWS)
+	file_os.CreateFile(path,args.access,args.share_mode,args.sa,args.create,args.attrs_flags,args.template);
+#endif
+
+}
+
+
+
+
+ADL_RESULT Close(ADL_FILE_DESC fd)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.close(fd);
+#elif defined(ADL_OS_WINDOWS)
+	return file_os.CloseHandle(fd);
+#endif
+}
+
+
+ADL_RESULT Read(ADL_FILE_DESC fd,void *buf,u64 buf_size)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.read(fd,buf,buf_size);
+#elif defined(ADL_OS_WINDOWS)
+	u64 numread = 0;
+	ADL_RESULT_INIT(res_tmp);
+
+	res_tmp = file_os.ReadFile(fd,buf,buf_size,(LPDWORD)&numread,NULL);
+	if(!ADL_RESULT_CHECK_ERROR(res_tmp))
+	{
+		res_tmp.code = numread;
+	}
+
+	return res_tmp;
+		
+#endif
+}
+
+
+ADL_RESULT Write(ADL_FILE_DESC fd,const void *buf,u64 buf_size)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.write(fd,buf,buf_size);
+#elif defined(ADL_OS_WINDOWS)
+	u64 numwrite = 0;
+	ADL_RESULT_INIT(res_tmp);
+
+	res_tmp = file_os.WriteFile(fd,buf,buf_size,(LPDWORD)&numwrite,NULL);
+	if(!ADL_RESULT_CHECK_ERROR(res_tmp))
+	{
+		res_tmp.code = numwrite;
+	}
+
+	return res_tmp;
+		
+#endif
+}
+
+
+
+ADL_RESULT Seek(ADL_FILE_DESC fd,s64 offset,s32 origin)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.lseek(fd,offset,origin);
+#elif defined(ADL_OS_WINDOWS)
+	LARGE_INTEGER pos;
+	pos.QuadPart = offset;
+	ADL_RESULT_INIT(res_tmp);
+
+	res_tmp = file_os.SetFilePointerEx(fd,pos,&pos,origin);
+	if(!ADL_RESULT_CHECK_ERROR(res_tmp))
+	{
+		res_tmp.code = pos.QuadPart;
+	}
+
+	return res_tmp;
+
+#endif
+}
+
+
+
+ADL_RESULT Truncate(const char *path,u64 length)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.truncate(path,length);
+#elif defined(ADL_OS_WINDOWS)
+	
+	ADL_FILE_ARGS args;
+	ADL_RESULT_INIT(res_tmp);
+
+	res_tmp = Open(path,args);
+	if(ADL_RESULT_CHECK_ERROR(res_tmp))
+	{
+		return res_tmp;
+	}
+
+	ADL_FILE_DESC fd = ADL_FILE_DESC_GET(res_tmp);
+	res_tmp = Seek(fd,length,ADL_FILE_SEEK_SET);
+	if(ADL_RESULT_CHECK_ERROR(res_tmp))
+	{
+		return res_tmp;
+	}
+
+	res_tmp = file_os.SetEndOfFile(fd);
+	Close(fd);
+
+	return res_tmp;
+#endif
+}
+
+ADL_RESULT Ftruncate(ADL_FILE_DESC fd,u64 length)
+{
+#if defined(ADL_OS_UNIX)
+	return file_os.ftruncate(fd,length);
+#elif defined(ADL_OS_WINDOWS)
+	
+	ADL_RESULT_INIT(res_tmp);
+
+	res_tmp = Seek(fd,length,ADL_FILE_SEEK_SET);
+	if(ADL_RESULT_CHECK_ERROR(res_tmp))
+	{
+		return res_tmp;
+	}
+
+	res_tmp = file_os.SetEndOfFile(fd);
+	Close(fd);
+
+	return res_tmp;
+#endif
+}
+
+
+
+static void windows_filetime_to_timespec(FILETIME ft, struct timespec *ts) 
+{
+#ifdef ADL_OS_WINDOWS
+	ULARGE_INTEGER t;
+    t.LowPart = ft.dwLowDateTime;
+    t.HighPart = ft.dwHighDateTime;
+    t.QuadPart -= 116444736000000000ULL; // Windows epoch -> Unix epoch
+    ts->tv_sec  = t.QuadPart / 10000000ULL;
+    ts->tv_nsec = (t.QuadPart % 10000000ULL) * 100;
+#endif
+}
+
+ADL_RESULT Stat(const char *path,ADL_STAT *info)
+{
+	ADL_RESULT_INIT(rdr_res);
+	if(ADL_CHECK_NULL(info))
+	{
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+#if defined(ADL_OS_UNIX)
+	struct stat sb;
+
+	rdr_res = file_os.stat(path,&sb);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	info->st_dev       = sb.st_dev;
+	info->st_ino       = sb.st_ino;
+	info->st_mode      = sb.st_mode;
+	info->st_nlink     = sb.st_nlink;
+	info->st_uid       = sb.st_uid;
+	info->st_gid       = sb.st_gid;
+	info->st_rdev      = sb.st_rdev;
+	info->st_size      = sb.st_size;
+	info->st_blksize   = sb.st_blksize;
+	info->st_blocks    = sb.st_blocks;
+	info->st_atim      = sb.st_atim;
+	info->st_mtim      = sb.st_mtim;
+	info->st_ctim      = sb.st_ctim;
+
+#elif defined(ADL_OS_WINDOWS)
+	
+	ADL_FILE_ARGS args;
+    rdr_res = Open(path,args);
+
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	ADL_FILE_DESC fd = ADL_FILE_DESC_GET(rdr_res);
+	rdr_res = Fstat(fd,info);
+    Close(fd);
+#endif
+failed_call:
+	return rdr_res;
+}
+
+
+ADL_RESULT Fstat(ADL_FILE_DESC fd,ADL_STAT *info)
+{
+	ADL_RESULT_INIT(rdr_res);
+	if(ADL_CHECK_NULL(info))
+	{
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+#if defined(ADL_OS_UNIX)
+	struct stat sb;
+
+	rdr_res = file_os.fstat(fd,&sb);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	info->st_dev       = sb.st_dev;
+	info->st_ino       = sb.st_ino;
+	info->st_mode      = sb.st_mode;
+	info->st_nlink     = sb.st_nlink;
+	info->st_uid       = sb.st_uid;
+	info->st_gid       = sb.st_gid;
+	info->st_rdev      = sb.st_rdev;
+	info->st_size      = sb.st_size;
+	info->st_blksize   = sb.st_blksize;
+	info->st_blocks    = sb.st_blocks;
+	info->st_atim      = sb.st_atim;
+	info->st_mtim      = sb.st_mtim;
+	info->st_ctim      = sb.st_ctim;
+
+
+#elif defined(ADL_OS_WINDOWS)
+	
+    BY_HANDLE_FILE_INFORMATION info_tmp;
+    rdr_res = file_os.GetFileInformationByHandle(fd,&info_tmp);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+
+
+    // Device (volume serial number)
+    info->st_dev = (u64)info_tmp.dwVolumeSerialNumber;
+
+    // Inode (combine high + low)
+    info->st_ino = ((u64)info_tmp.nFileIndexHigh << 32) | info_tmp.nFileIndexLow;
+
+    // Mode
+    info->st_mode = 0;
+
+    if (info_tmp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        info->st_mode |= 0x4000; // S_IFDIR
+    } else {
+        info->st_mode |= 0x8000; // S_IFREG
+    }
+    if (!(info_tmp.dwFileAttributes & FILE_ATTRIBUTE_READONLY)) {
+        info->st_mode |= 0x0100; // S_IWUSR
+    }
+
+    // Link count
+    info->st_nlink = info_tmp.nNumberOfLinks;
+
+    // UID/GID not supported
+    info->st_uid = 0;
+    info->st_gid = 0;
+
+    // Special file (rdev)
+    info->st_rdev = 0;
+
+    // File size
+    info->st_size = ((u64)info_tmp.nFileSizeHigh << 32) | info_tmp.nFileSizeLow;
+
+    // Timestamps
+    windows_filetime_to_timespec(info_tmp.ftLastAccessTime, &info->st_atim);
+    windows_filetime_to_timespec(info_tmp.ftLastWriteTime, &info->st_mtim);
+    windows_filetime_to_timespec(info_tmp.ftCreationTime,     &info->st_ctim);
+
+    // Optional: block size (dummy or from volume info)
+    info->st_blksize = 4096;
+
+    // Number of 512-byte blocks
+    info->st_blocks = (info->st_size + 511) / 512;
+#endif
+
+failed_call:
+	return rdr_res;
+}
+
+
+ADL_RESULT Lstat(const char *path,ADL_STAT *info)
+{
+	ADL_RESULT_INIT(rdr_res);
+	if(ADL_CHECK_NULL(info))
+	{
+		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+#if defined(ADL_OS_UNIX)
+	struct stat sb;
+
+	rdr_res = file_os.lstat(path,&sb);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	info->st_dev       = sb.st_dev;
+	info->st_ino       = sb.st_ino;
+	info->st_mode      = sb.st_mode;
+	info->st_nlink     = sb.st_nlink;
+	info->st_uid       = sb.st_uid;
+	info->st_gid       = sb.st_gid;
+	info->st_rdev      = sb.st_rdev;
+	info->st_size      = sb.st_size;
+	info->st_blksize   = sb.st_blksize;
+	info->st_blocks    = sb.st_blocks;
+	info->st_atim      = sb.st_atim;
+	info->st_mtim      = sb.st_mtim;
+	info->st_ctim      = sb.st_ctim;
+
+#elif defined(ADL_OS_WINDOWS)
+	
+	ADL_FILE_ARGS args;
+	args.attrs_flags |= FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT;
+
+    rdr_res = Open(path,args);
+
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		ADL_RETURN_DEFER(failed_call);
+	}
+
+	ADL_FILE_DESC fd = ADL_FILE_DESC_GET(rdr_res);
+	rdr_res = Fstat(fd,info);
+    Close(fd);
+#endif
+failed_call:
+	return rdr_res;
+}
+
+
+
+
+ADL_RESULT Access(const char *path,ADL_FILE_ARGS args)
+{
+
+#if defined(ADL_OS_UNIX)
+	return file_os.access(path,args.access);
+#elif defined(ADL_OS_WINDOWS)
+	    // Check if file exists
+	ADL_RESULT_INIT(rdr_res);
+	ADL_FILE_ARGS args1;
+
+    rdr_res = file_os.GetFileAttributesA(path);
+	if(ADL_RESULT_CHECK_ERROR(rdr_res))
+	{
+		return rdr_res;
+	}
+
+    if (args.mode == ADL_FILE_ACCESS_EXISTS) {
+        return rdr_res; // Exists, no other check
+    }
+
+    // Check read access: try to open with GENERIC_READ
+    if (args.mode & ADL_FILE_ACCESS_READ)
+	{    
+		args1.access       = GENERIC_READ;
+        args1.share_mode   = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+        args1.sa           = NULL;
+        args1.create       = OPEN_EXISTING;
+        args1.attrs_flags  = FILE_ATTRIBUTE_NORMAL;
+        args1.template     = NULL;
+		
+		rdr_res = Open(path,args1);
+
+        if (ADL_RESULT_CHECK_ERROR(rdr_res)) 
+		{
+            return rdr_res;
+        }
+
+        Close(ADL_FILE_DESC_GET(rdr_res));
+    }
+
+    // Check write access: try to open with GENERIC_WRITE
+    if (args.mode & ADL_FILE_ACCESS_WRITE)
+	{
+		args1.access       = GENERIC_WRITE;
+        args1.share_mode   = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+        args1.sa           = NULL;
+        args1.create       = OPEN_EXISTING;
+        args1.attrs_flags  = FILE_ATTRIBUTE_NORMAL;
+        args1.template     = NULL;
+		
+		rdr_res = Open(path,args1);
+
+        if (ADL_RESULT_CHECK_ERROR(rdr_res)) 
+		{
+            return rdr_res;
+        }
+
+        Close(ADL_FILE_DESC_GET(rdr_res));
+    }
+
+    // Check execute permission: Windows does not have explicit execute bits,
+    // check file extension as a heuristic.
+
+    if (args.mode & ADL_FILE_ACCESS_EXECUTE) 
+	{
+        // Get file extension
+        const char *ext = ADL_STRRCHR(path, '.');
+        if (ADL_CHECK_NULL(ext))
+		{
+			// No extension = no exec
+			rdr_res.code = -1;
+			return rdr_res;
+		}
+        
+		if (ADL_CHECK_EQUAL(_STRICMP(ext, ".exe"),0) || ADL_CHECK_EQUAL(_STRICMP(ext, ".bat"),0) ||ADL_CHECK_EQUAL(_STRICMP(ext, ".cmd"),0) ||ADL_CHECK_EQUAL(_STRICMP(ext, ".com"),0))
+		{
+            rdr_res.code = 0;
+			return rdr_res;
+        } 
+
+        // Not executable extension
+		rdr_res.code = -1;
+    }
+
+    return rdr_res;
+#endif
+
+}
+
+/**
+ADL_RESULT Exists(const char *path);
+ADL_RESULT FileType(const char *path);
+
+
+ADL_RESULT Chmod(const char *path,ADL_FILE_ARGS args);
+ADL_RESULT Fchmod(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+ADL_RESULT Chown(const char *path,ADL_FILE_ARGS args);
+ADL_RESULT Fchown(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+ADL_RESULT Lchown(const char *path,ADL_FILE_ARGS args);
+
+
+
+ADL_RESULT HardLink(const char *linkpath,const char *targetpath,ADL_FILE_ARGS args);
+ADL_RESULT SymLink(const char *linkpath,const char *targetpath,ADL_FILE_ARGS args);
+ADL_RESULT ReadLink(const char *path,void *buf,u64 bufsize);
+
+ADL_RESULT Copy(const char *dst,const char *src,ADL_FILE_ARGS args);
+ADL_RESULT Move(const char *dst,const char *src,ADL_FILE_ARGS args);
+
+ADL_RESULT Dup(ADL_FILE_DESC fd1,ADL_FILE_DESC fd2);
+ADL_RESULT Delete(const char *path);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ADL_RESULT create_file_v2(const char *name,ADL_FILE_ARGS args)
@@ -364,7 +860,7 @@ ADL_RESULT sync_file_v1(void)
 ADL_RESULT stat_file_v1(ADL_FILE_DESC fd,ADL_STAT *buf)
 {
 	ADL_RESULT_INIT(rdr_res);
-	if(ADL_CHECK_NULL(buf))
+	if(ADL_CHECK_NULL(info))
 	{
 		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
 		ADL_RETURN_DEFER(failed_call);
@@ -380,19 +876,19 @@ ADL_RESULT stat_file_v1(ADL_FILE_DESC fd,ADL_STAT *buf)
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	buf->st_dev       = sb.st_dev;
-	buf->st_ino       = sb.st_ino;
-	buf->st_mode      = sb.st_mode;
-	buf->st_nlink     = sb.st_nlink;
-	buf->st_uid       = sb.st_uid;
-	buf->st_gid       = sb.st_gid;
-	buf->st_rdev      = sb.st_rdev;
-	buf->st_size      = sb.st_size;
-	buf->st_blksize   = sb.st_blksize;
-	buf->st_blocks    = sb.st_blocks;
-	buf->st_atim      = sb.st_atim;
-	buf->st_mtim      = sb.st_mtim;
-	buf->st_ctim      = sb.st_ctim;
+	info->st_dev       = sb.st_dev;
+	info->st_ino       = sb.st_ino;
+	info->st_mode      = sb.st_mode;
+	info->st_nlink     = sb.st_nlink;
+	info->st_uid       = sb.st_uid;
+	info->st_gid       = sb.st_gid;
+	info->st_rdev      = sb.st_rdev;
+	info->st_size      = sb.st_size;
+	info->st_blksize   = sb.st_blksize;
+	info->st_blocks    = sb.st_blocks;
+	info->st_atim      = sb.st_atim;
+	info->st_mtim      = sb.st_mtim;
+	info->st_ctim      = sb.st_ctim;
 
 #else
 #ifdef ADL_OS_WINDOWS
@@ -409,7 +905,7 @@ failed_call:
 ADL_RESULT stat_file_v2(const char *name,ADL_STAT *buf)
 {
 	ADL_RESULT_INIT(rdr_res);
-	if(ADL_CHECK_NULL(buf))
+	if(ADL_CHECK_NULL(info))
 	{
 		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
 		ADL_RETURN_DEFER(failed_call);
@@ -418,25 +914,25 @@ ADL_RESULT stat_file_v2(const char *name,ADL_STAT *buf)
 #ifdef ADL_OS_UNIX
 	struct stat sb;
 
-	rdr_res = file_linux.stat(name,&sb);
+	rdr_res = file_linux.stat(path,&sb);
 	if(ADL_RESULT_CHECK_ERROR(rdr_res))
 	{
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	buf->st_dev       = sb.st_dev;
-	buf->st_ino       = sb.st_ino;
-	buf->st_mode      = sb.st_mode;
-	buf->st_nlink     = sb.st_nlink;
-	buf->st_uid       = sb.st_uid;
-	buf->st_gid       = sb.st_gid;
-	buf->st_rdev      = sb.st_rdev;
-	buf->st_size      = sb.st_size;
-	buf->st_blksize   = sb.st_blksize;
-	buf->st_blocks    = sb.st_blocks;
-	buf->st_atim      = sb.st_atim;
-	buf->st_mtim      = sb.st_mtim;
-	buf->st_ctim      = sb.st_ctim;
+	info->st_dev       = sb.st_dev;
+	info->st_ino       = sb.st_ino;
+	info->st_mode      = sb.st_mode;
+	info->st_nlink     = sb.st_nlink;
+	info->st_uid       = sb.st_uid;
+	info->st_gid       = sb.st_gid;
+	info->st_rdev      = sb.st_rdev;
+	info->st_size      = sb.st_size;
+	info->st_blksize   = sb.st_blksize;
+	info->st_blocks    = sb.st_blocks;
+	info->st_atim      = sb.st_atim;
+	info->st_mtim      = sb.st_mtim;
+	info->st_ctim      = sb.st_ctim;
 
 #else
 #ifdef ADL_OS_WINDOWS
@@ -453,7 +949,7 @@ failed_call:
 ADL_RESULT stat_file_v3(const char *name,ADL_STAT *buf)
 {
 	ADL_RESULT_INIT(rdr_res);
-	if(ADL_CHECK_NULL(buf))
+	if(ADL_CHECK_NULL(info))
 	{
 		rdr_res = ADL_RESULT_WRITE(0,-1,(ADL_STRING){},NULL);
 		ADL_RETURN_DEFER(failed_call);
@@ -462,25 +958,25 @@ ADL_RESULT stat_file_v3(const char *name,ADL_STAT *buf)
 #ifdef ADL_OS_UNIX
 	struct stat sb;
 
-	rdr_res = file_linux.lstat(name,&sb);
+	rdr_res = file_linux.lstat(path,&sb);
 	if(ADL_RESULT_CHECK_ERROR(rdr_res))
 	{
 		ADL_RETURN_DEFER(failed_call);
 	}
 
-	buf->st_dev       = sb.st_dev;
-	buf->st_ino       = sb.st_ino;
-	buf->st_mode      = sb.st_mode;
-	buf->st_nlink     = sb.st_nlink;
-	buf->st_uid       = sb.st_uid;
-	buf->st_gid       = sb.st_gid;
-	buf->st_rdev      = sb.st_rdev;
-	buf->st_size      = sb.st_size;
-	buf->st_blksize   = sb.st_blksize;
-	buf->st_blocks    = sb.st_blocks;
-	buf->st_atim      = sb.st_atim;
-	buf->st_mtim      = sb.st_mtim;
-	buf->st_ctim      = sb.st_ctim;
+	info->st_dev       = sb.st_dev;
+	info->st_ino       = sb.st_ino;
+	info->st_mode      = sb.st_mode;
+	info->st_nlink     = sb.st_nlink;
+	info->st_uid       = sb.st_uid;
+	info->st_gid       = sb.st_gid;
+	info->st_rdev      = sb.st_rdev;
+	info->st_size      = sb.st_size;
+	info->st_blksize   = sb.st_blksize;
+	info->st_blocks    = sb.st_blocks;
+	info->st_atim      = sb.st_atim;
+	info->st_mtim      = sb.st_mtim;
+	info->st_ctim      = sb.st_ctim;
 
 #else
 #ifdef ADL_OS_WINDOWS
@@ -732,5 +1228,5 @@ null_file:
 }
 
 
-
+*/
 

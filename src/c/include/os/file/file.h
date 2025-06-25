@@ -11,6 +11,10 @@ typedef s32 ADL_FILE_DESC;
 
 #define ADL_FILE_INVALID_HANDLE_VALUE (-1)
 
+#ifndef ADL_FILE_DESC_GET
+#define ADL_FILE_DESC_GET(rdr_res) ADL_RESULT_READ_CODE(rdr_res)
+#endif
+
 #define ADL_FILE_READ         O_RDONLY
 #define ADL_FILE_WRITE    	  O_WRONLY
 #define ADL_FILE_RDWR         O_RDWR
@@ -26,6 +30,13 @@ typedef s32 ADL_FILE_DESC;
 
 
 
+#define ADL_FILE_ACCESS_READ       R_OK
+#define ADL_FILE_ACCESS_WRITE      W_OK
+#define ADL_FILE_ACCESS_EXECUTE    X_OK
+#define ADL_FILE_ACCESS_EXISTS     F_OK
+
+
+
 
 typedef struct iovec ADL_IOVEC;
 
@@ -34,6 +45,10 @@ typedef struct iovec ADL_IOVEC;
 typedef HANDLE ADL_FILE_DESC;
 
 #define ADL_FILE_INVALID_HANDLE_VALUE INVALID_HANDLE_VALUE
+
+#ifndef ADL_FILE_DESC_GET
+#define ADL_FILE_DESC_GET(rdr_res) ADL_RESULT_READ_PTR(rdr_res)
+#endif
 
 #define ADL_FILE_READ       _O_RDONLY
 #define ADL_FILE_WRITE      _O_WRONLY
@@ -47,6 +62,12 @@ typedef HANDLE ADL_FILE_DESC;
 #define ADL_FILE_SEEK_CUR   FILE_CURRENT
 #define ADL_FILE_SEEK_END   FILE_END
 
+#define ADL_FILE_ACCESS_EXISTS 	   0 // Check existence
+#define ADL_FILE_ACCESS_READ 	   4 // Check read permission
+#define ADL_FILE_ACCESS_WRITE 	   2 // Check write permission
+#define ADL_FILE_ACCESS_EXECUTE    1 // Check execute permission
+
+
 typedef struct ADL_IOVEC
 {
 	void_ptr base;
@@ -56,37 +77,35 @@ typedef struct ADL_IOVEC
 #endif
 
 
-
-typedef struct ADL_STAT
-{
-	u64 st_dev;     // dev_t: ID of device containing file
-    u64 st_ino;     // ino_t: inode number
-    u32 st_mode;    // mode_t: file type and mode
-    u32 st_nlink;   // nlink_t: number of hard links
-    u32 st_uid;     // uid_t: user ID of owner
-    u32 st_gid;     // gid_t: group ID of owner
-    u64 st_rdev;    // dev_t: device ID (if special file)
-    s64 st_size;    // off_t: total size, in bytes
-    s64 st_blksize; // blksize_t: block size for filesystem I/O
-    s64 st_blocks;  // blkcnt_t: number of 512B blocks allocated
-
 #ifdef ADL_OS_TIMESPEC_UNDEFINED
-    struct timespec {
-        s64 tv_sec;   // time_t: seconds
-        s64 tv_nsec;  // s64: nanoseconds
-    };
-
+struct timespec 
+{
+    s64 tv_sec;
+    s64 tv_nsec;
+};
 #endif
 
-	struct timespec st_atim;
+typedef struct ADL_STAT 
+{
+    u64 st_dev;
+    u64 st_ino;
+    u64 st_mode;
+    u64 st_nlink;
+    u64 st_uid;
+    u64 st_gid;
+    u64 st_rdev;
+    s64 st_size;
+    s64 st_blksize;
+    s64 st_blocks;
+    struct timespec st_atim;
     struct timespec st_mtim;
     struct timespec st_ctim;
+} ADL_STAT;
 
-	#define st_atime st_atim.tv_sec
-	#define st_mtime st_mtim.tv_sec
-	#define st_ctime st_ctim.tv_sec
+#define st_atime st_atim.tv_sec
+#define st_mtime st_mtim.tv_sec
+#define st_ctime st_ctim.tv_sec
 
-}ADL_STAT;
 
 
 
@@ -98,6 +117,13 @@ typedef struct ADL_FILE_ARGS
 	u64 mode;
 	u32 uid;
 	u32 gid;
+
+	u32 access;
+	void *sa;
+	u32 share_mode;
+	u32 create;
+	u32 attrs_flags;
+	ADL_FILE_DESC template;
 }ADL_FILE_ARGS;
 
 
@@ -112,23 +138,50 @@ typedef struct ADL_FILE
 	ADL_RESULT (*Write)(ADL_FILE_DESC fd,const void *buf,u64 buf_size);
 
 
+	
 	ADL_RESULT (*Seek)(ADL_FILE_DESC fd,s64 offset,s32 origin);
 	ADL_RESULT (*Truncate)(const char *path,u64 length);
 	ADL_RESULT (*Ftruncate)(ADL_FILE_DESC fd,u64 length);
 
 
+	
 	ADL_RESULT (*Stat)(const char *path,ADL_STAT *info);
 	ADL_RESULT (*Fstat)(ADL_FILE_DESC fd,ADL_STAT *info);
 	ADL_RESULT (*Lstat)(const char *path,ADL_STAT *info);
 
+
 	
+	ADL_RESULT (*Access)(const char *path,ADL_FILE_ARGS args);
+	ADL_RESULT (*Exists)(const char *path);
+	ADL_RESULT (*FileType)(const char *path);
+
+	
+	ADL_RESULT (*Chmod)(const char *path,ADL_FILE_ARGS args);
+	ADL_RESULT (*Fchmod)(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+	ADL_RESULT (*Chown)(const char *path,ADL_FILE_ARGS args);
+	ADL_RESULT (*Fchown)(ADL_FILE_DESC fd,ADL_FILE_ARGS args);
+	ADL_RESULT (*Lchown)(const char *path,ADL_FILE_ARGS args);
+
+
+
+	ADL_RESULT (*HardLink)(const char *linkpath,const char *targetpath,ADL_FILE_ARGS args);
+	ADL_RESULT (*SymLink)(const char *linkpath,const char *targetpath,ADL_FILE_ARGS args);
+	ADL_RESULT (*ReadLink)(const char *path,void *buf,u64 bufsize);
+
+	ADL_RESULT (*Copy)(const char *dst,const char *src,ADL_FILE_ARGS args);
+	ADL_RESULT (*Move)(const char *dst,const char *src,ADL_FILE_ARGS args);
+
+	ADL_RESULT (*Dup)(ADL_FILE_DESC fd1,ADL_FILE_DESC fd2);
+	ADL_RESULT (*Delete)(const char *path);
+
+
 }ADL_FILE;
 
 
 
-void ADL_FILE_init(ADL_FILE *file);
+void ADL_FILE_Init(ADL_FILE *file);
 
-void ADL_FILE_fini(ADL_FILE *file);
+void ADL_FILE_Fini(ADL_FILE *file);
 
 
 #endif
