@@ -24,7 +24,7 @@ UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_
 
 ADL_WINDOWS_LIB = $(TARGET)/libwinadl.a
 
-WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/windows.o $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o
+WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/windows.o $(WINDOWS_OBJ)/os.o $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o
 
 windows_install: $(ADL_WINDOWS_LIB)
 	sudo cp $(ADL_WINDOWS_LIB) /usr/i686-w64-mingw32/lib
@@ -40,6 +40,10 @@ $(OS_OBJ)/windows_file.o: $(SRC_C)/os/file/file.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 $(OS_OBJ)/windows_file_windows.o: $(SRC_C)/os/file/platform/windows/file_windows.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+
+$(WINDOWS_OBJ)/os.o: $(SRC_C)/os/os.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 $(WINDOWS_OBJ)/windows.o: $(SRC_C)/windows/windows.c

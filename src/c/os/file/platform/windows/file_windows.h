@@ -94,7 +94,7 @@ typedef struct ADL_FILE_WINDOWS
 
 void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class);
 
-void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class);
+void ADL_FILE_WINDOWS_Fini(ADL_FILE_WINDOWS *class);
 
 #endif
 

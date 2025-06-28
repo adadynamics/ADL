@@ -2,9 +2,9 @@
 
 
 
-#ifdef ADL_OS_UNIX
+#ifdef ADL_OS_WINDOWS
 
-$
+extern ADL_WINDOWS adl_os;
 
 void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class)
 {
@@ -98,7 +98,7 @@ null_class:
     return;
 }
 
-void ADL_FILE_WINDOWS_Init(ADL_FILE_WINDOWS *class)
+void ADL_FILE_WINDOWS_Fini(ADL_FILE_WINDOWS *class)
 {
     if(ADL_CHECK_NULL(class))
     {
