@@ -1,13 +1,13 @@
-#ifndef ADL_OS_NET_SOCKET_SOCKET_H
-#define ADL_OS_NET_SOCKET_SOCKET_H
-
-#include "../../../unix/unix.h"
-#include "../../os.h"
+#ifndef ADL_SRC_OS_NET_PLATFORM_WINDOWS_SOCKET_WINDOWS_H
+#define ADL_SRC_OS_NET_PLATFORM_WINDOWS_SOCKET_WINDOWS_H
 
 
+#include "../../../os.h"
+
+#ifdef ADL_OS_WINDOWS
 
 
-typedef struct ADL_SOCKET
+typedef struct ADL_SOCKET_WINDOWS
 {
 	ADL_RESULT (*socket)(s32 domain,s32 type,s32 protocol);
 	ADL_RESULT (*socketpair)(s32 domain,s32 type,s32 protocol,ADL_SOCKET_DESC sockfds[2]);
@@ -18,20 +18,16 @@ typedef struct ADL_SOCKET
 	ADL_RESULT (*accept4)(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen,s32 flags);
 	ADL_RESULT (*recv)(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,s32 flags);
 	ADL_RESULT (*recvfrom)(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,s32 flags,struct sockaddr *addr,socklen_t *addrlen);
-/**
-#ifdef ADL_OS_UNIX
+	/*
 	ADL_RESULT (*recvmsg)(ADL_SOCKET_DESC sockfd,struct msghdr *msg,s32 flags);
 	ADL_RESULT (*recvmmsg)(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,s32 vlen,s32 flags,struct timespec *timeout);
-#endif
-*/
+	*/
 	ADL_RESULT (*send)(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,s32 flags);
 	ADL_RESULT (*sendto)(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,s32 flags,struct sockaddr *addr,socklen_t addrlen);
-/**
-#ifdef ADL_OS_UNIX
+	/*
 	ADL_RESULT (*sendmsg)(ADL_SOCKET_DESC sockfd,const struct msghdr *msg,s32 flags);
 	ADL_RESULT (*sendmmsg)(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,s32 vlen,s32 flags);
-#endif
-*/
+	*/
 	ADL_RESULT (*shutdown)(ADL_SOCKET_DESC sockfd,s32 how);
 	ADL_RESULT (*close)(ADL_SOCKET_DESC sockfd);
 	ADL_RESULT (*getsockopt)(ADL_SOCKET_DESC sockfd,s32 level,s32 optname,void *optval,socklen_t *optlen);
@@ -45,14 +41,17 @@ typedef struct ADL_SOCKET
 	ADL_RESULT (*htonl)(u32 hostlong);
 	ADL_RESULT (*ntohs)(u16 netshort);
 	ADL_RESULT (*ntohl)(u32 netlong);
-}ADL_SOCKET;
+}ADL_SOCKET_WINDOWS;
 
 
 
+void ADL_SOCKET_WINDOWS_Init(ADL_SOCKET_WINDOWS *class);
 
-void ADL_SOCKET_Init(ADL_SOCKET *class);
+void ADL_SOCKET_WINDOWS_Fini(ADL_SOCKET_WINDOWS *class);
 
-void ADL_SOCKET_Fini(ADL_SOCKET *class);
+
+
+#endif
 
 
 

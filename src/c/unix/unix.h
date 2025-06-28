@@ -130,6 +130,33 @@ int userfaultfd(int flags);
 
 
 
+#ifndef ADL_WINDOWS_SOCKET_INIT
+#define ADL_WINDOWS_SOCKET_INIT(val,valptr) ADL_SOCKET_DESC  val = (ADL_SOCKET_DESC)0;  \
+                                   ADL_VOID_PTR_INIT(valptr); \
+                                   ADL_ERRNO_INIT();   \
+                                   ADL_RESULT_RETURN_DEFER_INIT();
+#endif
+
+
+
+#ifndef ADL_WINDOWS_SOCKET_FINI
+#define ADL_WINDOWS_SOCKET_FINI(val,valptr)  if(ADL_CHECK_EQUAL(val,ADL_INVALID_SOCKET))                                                  \
+                            {                                                                                   \
+                                ADL_STRING str;                                                                 \
+                                ADL_STRING_Init(&str,ADL_STRERROR(ADL_SOCKET_ERRNO));                                      \
+                                ADL_RESULT_RETURN_DEFER(failed_syscall, ADL_RESULT_WRITE(ADL_SOCKET_ERRNO,val,str,valptr));      \
+                            }                                                                                   \
+                                                                                                                \
+                            ADL_RESULT_RETURN_DEFER(success_syscall,ADL_RESULT_WRITE(ADL_SOCKET_ERRNO,val,(ADL_STRING){},valptr));  \
+                                               \
+                            failed_syscall:    \
+                            success_syscall:   \
+                                ADL_RESULT_RETURN_DEFER_FINI()                                
+
+#endif
+
+
+
 
 
 #endif

@@ -14,11 +14,75 @@
 #include <ws2tcpip.h>
 #include <windows.h>
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0600
+#endif
+
+
+#pragma comment(lib,"ws2_32.lib")
+
+
+
+#ifndef ADL_SOCKET_DESC
+#define ADL_SOCKET_DESC SOCKET
+#endif
+
+
+#ifndef ADL_INVALID_SOCKET
+#define ADL_INVALID_SOCKET INVALID_SOCKET
+#endif
+
+
+#ifndef ADL_SOCKET_ERRNO
+#define ADL_SOCKET_ERRNO WSAGetLastError()
+#endif
 
 
 
 typedef struct ADL_WINDOWS
 {
+
+    bool (*SocketInit)(void);
+    bool (*SocketFini)(void);
+    ADL_RESULT (*socket)(int domain,int type,int protocol);
+    /**
+    ADL_RESULT (*socketpair)(int domain,int type,int protocol,ADL_SOCKET_DESC sockfds[2]);
+    */
+    ADL_RESULT (*bind)(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,socklen_t addrlen);
+    ADL_RESULT (*connect)(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,socklen_t addrlen);
+    ADL_RESULT (*listen)(ADL_SOCKET_DESC sockfd,int backlog);
+    ADL_RESULT (*accept)(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen);
+    /*
+    ADL_RESULT (*accept4)(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen,int flags);
+    */
+    ADL_RESULT (*recv)(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags);
+    ADL_RESULT (*recvfrom)(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t *addrlen);
+    /**
+    ADL_RESULT (*recvmsg)(ADL_SOCKET_DESC sockfd,struct msghdr *msg,int flags);
+    ADL_RESULT (*recvmmsg)(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags,struct timespec *timeout);
+    */
+    ADL_RESULT (*send)(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int flags);
+    ADL_RESULT (*sendto)(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t addrlen);
+    /**
+    ADL_RESULT (*sendmsg)(ADL_SOCKET_DESC sockfd,const struct msghdr *msg,int flags);
+    ADL_RESULT (*sendmmsg)(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags);
+    */
+    ADL_RESULT (*shutdown)(ADL_SOCKET_DESC sockfd,int how);
+    ADL_RESULT (*close)(ADL_SOCKET_DESC fd);
+    ADL_RESULT (*getsockopt)(ADL_SOCKET_DESC sockfd,int level,int optname,void *optval,socklen_t *optlen);
+    ADL_RESULT (*setsockopt)(ADL_SOCKET_DESC sockfd,int level,int optname,void *optval,socklen_t optlen);
+    ADL_RESULT (*getsockname)(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen);
+    ADL_RESULT (*getpeername)(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen);
+    ADL_RESULT (*getaddrinfo)(const char *host,const char *service,struct addrinfo *hints,struct addrinfo **res);
+    ADL_RESULT (*freeaddrinfo)(struct addrinfo *res);
+    ADL_RESULT (*getnameinfo)(const struct sockaddr *addr,socklen_t addrlen,char *host,socklen_t hostlen,char *service,socklen_t servicelen,int flags);
+    ADL_RESULT (*htons)(u16 hostshort);
+    ADL_RESULT (*htonl)(u32 hostlong);
+    ADL_RESULT (*ntohs)(u16 netshort);
+    ADL_RESULT (*ntohl)(u32 netlong);
+
+
+
     /*
 
         MISCELLENIOUS
@@ -138,7 +202,7 @@ typedef struct ADL_WINDOWS
     ADL_RESULT (*FindClose)(HANDLE handle); 
 
 
-
+    
 
 }ADL_WINDOWS;
 

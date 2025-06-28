@@ -143,7 +143,36 @@
 
 
 
-
+bool adl_lib_SocketInit(void);
+bool adl_lib_SocketFini(void);
+ADL_RESULT adl_sys_socket(int domain,int type,int protocol);
+ADL_RESULT adl_sys_socketpair(int domain,int type,int protocol,int sockfds[2]);
+ADL_RESULT adl_sys_bind(int sockfd,const struct sockaddr *addr,socklen_t addrlen);
+ADL_RESULT adl_sys_connect(int sockfd,const struct sockaddr *addr,socklen_t addrlen);
+ADL_RESULT adl_sys_listen(int sockfd,int backlog);
+ADL_RESULT adl_sys_accept(int sockfd,struct sockaddr *addr,socklen_t *addrlen);
+ADL_RESULT adl_sys_accept4(int sockfd,struct sockaddr *addr,socklen_t *addrlen,int flags);
+ADL_RESULT adl_sys_recv(int sockfd,void *buf,size_t buflen,int flags);
+ADL_RESULT adl_sys_recvfrom(int sockfd,void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t *addrlen);
+ADL_RESULT adl_sys_recvmsg(int sockfd,struct msghdr *msg,int flags);
+ADL_RESULT adl_sys_recvmmsg(int sockfd,struct mmsghdr *msgvec,int vlen,int flags,struct timespec *timeout);
+ADL_RESULT adl_sys_send(int sockfd,const void *buf,size_t buflen,int flags);
+ADL_RESULT adl_sys_sendto(int sockfd,const void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t addrlen);
+ADL_RESULT adl_sys_sendmsg(int sockfd,const struct msghdr *msg,int flags);
+ADL_RESULT adl_sys_sendmmsg(int sockfd,struct mmsghdr *msgvec,int vlen,int flags);
+ADL_RESULT adl_sys_shutdown(int sockfd,int how);
+ADL_RESULT adl_sys_close(int fd);
+ADL_RESULT adl_sys_getsockopt(int sockfd,int level,int optname,void *optval,socklen_t *optlen);
+ADL_RESULT adl_sys_setsockopt(int sockfd,int level,int optname,void *optval,socklen_t optlen);
+ADL_RESULT adl_sys_getsockname(int sockfd,struct sockaddr *addr,socklen_t *addrlen);
+ADL_RESULT adl_sys_getpeername(int sockfd,struct sockaddr *addr,socklen_t *addrlen);
+ADL_RESULT adl_lib_getaddrinfo(const char *host,const char *service,struct addrinfo *hints,struct addrinfo **res);
+ADL_RESULT adl_lib_freeaddrinfo(struct addrinfo *res);
+ADL_RESULT adl_lib_getnameinfo(const struct sockaddr *addr,socklen_t addrlen,char *host,socklen_t hostlen,char *service,socklen_t servicelen,int flags);
+ADL_RESULT adl_lib_htons(u16 hostshort);
+ADL_RESULT adl_lib_htonl(u32 hostlong);
+ADL_RESULT adl_lib_ntohs(u16 netshort);
+ADL_RESULT adl_lib_ntohl(u32 netlong);
 
 
 #endif

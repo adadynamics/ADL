@@ -14,6 +14,82 @@
 
 
 
+
+/*
+
+ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
+    
+            a wrapper for the socket system call on unix systems
+            
+            INPUT  : domain(eg. AF_INET,AF_INET6),type(eg. SOCK_STREAM,SOCK_RAW),protocol(eg. IPPROTO_TCP)
+            OUTPUT : returns a ADL_RESULT structure
+
+
+            ****
+                on success the ret member of the structure contains a valid socket descriptor which is a positive integral value
+
+                on error the ret member of the structure is set to -1, the errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+
+
+bool adl_lib_SocketInit(void)
+{
+    ADL_S64_INIT(ret);
+    WSADATA wsa;
+
+    if(WSAStartup(MAKEWORD(2,2),&wsa))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+
+
+
+
+
+
+/*
+
+ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
+    
+            a wrapper for the socket system call on unix systems
+            
+            INPUT  : domain(eg. AF_INET,AF_INET6),type(eg. SOCK_STREAM,SOCK_RAW),protocol(eg. IPPROTO_TCP)
+            OUTPUT : returns a ADL_RESULT structure
+
+
+            ****
+                on success the ret member of the structure contains a valid socket descriptor which is a positive integral value
+
+                on error the ret member of the structure is set to -1, the errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+
+
+bool adl_lib_SocketFini(void)
+{
+    WSACleanup();
+    return true;
+}
+
+
+
+
+
+
 /*
 
 ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
@@ -39,9 +115,9 @@ ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
 ADL_RESULT adl_lib_socket(int domain,int type,int protocol)
 {
 
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SOCKET(domain,type,protocol);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -69,17 +145,17 @@ ADL_RESULT adl_lib_socketpair(int domain,int type,int protocol,int sockfds[2]);
             ****
 
             ===>  NO DYNAMIC MEMORY IS USED
-*/
+
 
 
 ADL_RESULT adl_lib_socketpair(int domain,int type,int protocol,int sockfds[2])
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SOCKETPAIR(domain,type,protocol,sockfds);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
-
+*/
 
 
 
@@ -106,9 +182,9 @@ ADL_RESULT adl_lib_bind(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,sockl
 ADL_RESULT adl_lib_bind(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,socklen_t addrlen)
 {
     
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_BIND(sockfd,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -138,9 +214,9 @@ ADL_RESULT adl_lib_connect(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,so
 ADL_RESULT adl_lib_connect(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,socklen_t addrlen)
 {
     
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_CONNECT(sockfd,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -169,9 +245,9 @@ ADL_RESULT adl_lib_listen(ADL_SOCKET_DESC sockfd,int backlog);
 ADL_RESULT adl_lib_listen(ADL_SOCKET_DESC sockfd,int backlog)
 {
     
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_LISTEN(sockfd,backlog);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -204,9 +280,9 @@ ADL_RESULT adl_lib_accept(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t
 
 ADL_RESULT adl_lib_accept(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_ACCEPT(sockfd,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -235,17 +311,17 @@ ADL_RESULT adl_lib_accept4(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_
             ****
 
             ===>  NO DYNAMIC MEMORY IS USED
-*/
+
 
 
 ADL_RESULT adl_lib_accept4(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_ACCEPT4(sockfd,addr,addrlen,flags);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
-
+*/
 
 
 
@@ -271,9 +347,9 @@ ADL_RESULT adl_lib_recv(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags
 
 ADL_RESULT adl_lib_recv(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_RECV(sockfd,buf,buflen,flags);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -308,9 +384,9 @@ ADL_RESULT adl_lib_recvfrom(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int f
 ADL_RESULT adl_lib_recvfrom(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t *addrlen)
 {
 
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_RECVFROM(sockfd,buf,buflen,flags,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -333,21 +409,21 @@ ADL_RESULT adl_lib_recvmsg(ADL_SOCKET_DESC sockfd,struct msghdr *msg,int flags);
             ****
 
             ===>  NO DYNAMIC MEMORY IS USED
-*/
+
 
 
 ADL_RESULT adl_lib_recvmsg(ADL_SOCKET_DESC sockfd,struct msghdr *msg,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_RECVMSG(sockfd,msg,flags);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
 
 
 
-/*
+
 
 ADL_RESULT adl_lib_recvmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags,struct timespec *timeout);
 
@@ -363,19 +439,19 @@ ADL_RESULT adl_lib_recvmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vl
             ****
 
             ===>  NO DYNAMIC MEMORY IS USED
-*/
+
 
 
 ADL_RESULT adl_lib_recvmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags,struct timespec *timeout)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_RECVMMSG(sockfd,msgvec,vlen,flags,timeout);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
 
-
+*/
 
 
 /*
@@ -399,9 +475,9 @@ ADL_RESULT adl_lib_send(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int
 
 ADL_RESULT adl_lib_send(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SEND(sockfd,buf,buflen,flags);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -432,9 +508,9 @@ ADL_RESULT adl_lib_sendto(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,i
 
 ADL_RESULT adl_lib_sendto(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t addrlen)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SENDTO(sockfd,buf,buflen,flags,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -457,21 +533,21 @@ ADL_RESULT adl_lib_sendmsg(ADL_SOCKET_DESC sockfd,const struct msghdr *msg,int f
             ****
 
             ===>  NO DYNAMIC MEMORY IS USED
-*/
+
 
 
 ADL_RESULT adl_lib_sendmsg(ADL_SOCKET_DESC sockfd,const struct msghdr *msg,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SENDMSG(sockfd,msg,flags);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
 
 
 
-/*
+
 
 ADL_RESULT adl_lib_sendmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags);
 
@@ -487,17 +563,17 @@ ADL_RESULT adl_lib_sendmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vl
             ****
 
             ===>  NO DYNAMIC MEMORY IS USED
-*/
+
 
 
 ADL_RESULT adl_lib_sendmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SENDMMSG(sockfd,msgvec,vlen,flags);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
-
+*/
 
 
 
@@ -522,9 +598,9 @@ ADL_RESULT adl_lib_shutdown(ADL_SOCKET_DESC sockfd,int how);
 
 ADL_RESULT adl_lib_shutdown(ADL_SOCKET_DESC sockfd,int how)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SHUTDOWN(sockfd,how);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -552,9 +628,9 @@ ADL_RESULT adl_lib_closesocket(ADL_SOCKET_DESC sockfd);
 
 ADL_RESULT adl_lib_closesocket(ADL_SOCKET_DESC sockfd)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
-    rdr_ret = ADL_CLOSE(sockfd);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_CLOSESOCKET(sockfd);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -586,9 +662,9 @@ ADL_RESULT adl_lib_getsockopt(ADL_SOCKET_DESC sockfd,int level,int optname,void 
 
 ADL_RESULT adl_lib_getsockopt(ADL_SOCKET_DESC sockfd,int level,int optname,void *optval,socklen_t *optlen)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_GETSOCKOPT(sockfd,level,optname,optval,optlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -620,9 +696,9 @@ ADL_RESULT adl_lib_setsockopt(ADL_SOCKET_DESC sockfd,int level,int optname,void 
 
 ADL_RESULT adl_lib_setsockopt(ADL_SOCKET_DESC sockfd,int level,int optname,void *optval,socklen_t optlen)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_SETSOCKOPT(sockfd,level,optname,optval,optlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -655,9 +731,9 @@ ADL_RESULT adl_lib_getsockname(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,sock
 
 ADL_RESULT adl_lib_getsockname(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_GETSOCKNAME(sockfd,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -690,9 +766,9 @@ ADL_RESULT adl_lib_getpeername(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,sock
 
 ADL_RESULT adl_lib_getpeername(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_GETPEERNAME(sockfd,addr,addrlen);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -721,14 +797,14 @@ ADL_RESULT adl_lib_getaddrinfo(const char *host,const char *service,struct addri
 
 ADL_RESULT adl_lib_getaddrinfo(const char *host,const char *service,struct addrinfo *hints,struct addrinfo **res)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_GETADDRINFO(host,service,hints,res);
 
     if(ADL_CHECK_NOT_EQUAL(rdr_ret,0))
     {
         rdr_ret = -1;
     }
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -755,14 +831,14 @@ ADL_RESULT adl_lib_freeaddrinfo(struct addrinfo *res);
 
 ADL_RESULT adl_lib_freeaddrinfo(struct addrinfo *res)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     if(ADL_CHECK_NULL(res))
     {
         rdr_ret = -1;
     }
 
     ADL_FREEADDRINFO(res);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -790,14 +866,14 @@ ADL_RESULT adl_lib_getnameinfo(const struct sockaddr *addr,socklen_t addrlen,cha
 
 ADL_RESULT adl_lib_getnameinfo(const struct sockaddr *addr,socklen_t addrlen,char *host,socklen_t hostlen,char *service,socklen_t servicelen,int flags)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_GETNAMEINFO(addr,addrlen,host,hostlen,service,servicelen,flags);
 
     if(ADL_CHECK_NOT_EQUAL(rdr_ret,0))
     {
         rdr_ret = -1;
     }
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -824,9 +900,9 @@ ADL_RESULT adl_lib_htons(u16 hostshort);
 
 ADL_RESULT adl_lib_htons(u16 hostshort)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_HTONS(hostshort);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -852,9 +928,9 @@ ADL_RESULT adl_lib_htonl(u32 hostlong);
 
 ADL_RESULT adl_lib_htonl(u32 hostlong)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_HTONL(hostlong);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -880,9 +956,9 @@ ADL_RESULT adl_lib_ntohs(u16 netshort);
 
 ADL_RESULT adl_lib_ntohs(u16 netshort)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_NTOHS(netshort);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 
@@ -908,9 +984,9 @@ ADL_RESULT adl_lib_ntohl(u32 netlong);
 
 ADL_RESULT adl_lib_ntohl(u32 netlong)
 {
-    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_INIT(rdr_ret,rdr_retptr);
     rdr_ret = ADL_NTOHL(netlong);
-    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+    ADL_WINDOWS_SOCKET_FINI(rdr_ret,rdr_retptr);
 }
 
 

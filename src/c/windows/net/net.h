@@ -4,11 +4,13 @@
 
 #include "../windows.h"
 
-
 #ifdef ADL_OS_WINDOWS
 
 
-#define ADL_SOCKET_DESC SOCKET
+
+#ifndef ADL_WSASTARTUP
+#define ADL_WSASTARTUP WSAStartup
+#endif
 
 
 #ifndef ADL_SOCKET
@@ -83,8 +85,8 @@
 #define ADL_SHUTDOWN shutdown
 #endif
 
-#ifndef ADL_CLOSE
-#define ADL_CLOSE close
+#ifndef ADL_CLOSESOCKET
+#define ADL_CLOSESOCKET closesocket
 #endif
 
 
@@ -140,7 +142,44 @@
 #define ADL_NTOHL ntohl
 #endif
 
-
+bool adl_lib_SocketInit(void);
+bool adl_lib_SocketFini(void);
+ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
+/*
+ADL_RESULT adl_lib_socketpair(int domain,int type,int protocol,ADL_SOCKET_DESC sockfds[2]);
+*/
+ADL_RESULT adl_lib_bind(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,socklen_t addrlen);
+ADL_RESULT adl_lib_connect(ADL_SOCKET_DESC sockfd,const struct sockaddr *addr,socklen_t addrlen);
+ADL_RESULT adl_lib_listen(ADL_SOCKET_DESC sockfd,int backlog);
+ADL_RESULT adl_lib_accept(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen);
+/*
+ADL_RESULT adl_lib_accept4(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen,int flags);
+*/
+ADL_RESULT adl_lib_recv(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags);
+ADL_RESULT adl_lib_recvfrom(ADL_SOCKET_DESC sockfd,void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t *addrlen);
+/**
+ADL_RESULT adl_lib_recvmsg(ADL_SOCKET_DESC sockfd,struct msghdr *msg,int flags);
+ADL_RESULT adl_lib_recvmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags,struct timespec *timeout);
+*/
+ADL_RESULT adl_lib_send(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int flags);
+ADL_RESULT adl_lib_sendto(ADL_SOCKET_DESC sockfd,const void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t addrlen);
+/**
+ADL_RESULT adl_lib_sendmsg(ADL_SOCKET_DESC sockfd,const struct msghdr *msg,int flags);
+ADL_RESULT adl_lib_sendmmsg(ADL_SOCKET_DESC sockfd,struct mmsghdr *msgvec,int vlen,int flags);
+*/
+ADL_RESULT adl_lib_shutdown(ADL_SOCKET_DESC sockfd,int how);
+ADL_RESULT adl_lib_closesocket(ADL_SOCKET_DESC sockfd);
+ADL_RESULT adl_lib_getsockopt(ADL_SOCKET_DESC sockfd,int level,int optname,void *optval,socklen_t *optlen);
+ADL_RESULT adl_lib_setsockopt(ADL_SOCKET_DESC sockfd,int level,int optname,void *optval,socklen_t optlen);
+ADL_RESULT adl_lib_getsockname(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen);
+ADL_RESULT adl_lib_getpeername(ADL_SOCKET_DESC sockfd,struct sockaddr *addr,socklen_t *addrlen);
+ADL_RESULT adl_lib_getaddrinfo(const char *host,const char *service,struct addrinfo *hints,struct addrinfo **res);
+ADL_RESULT adl_lib_freeaddrinfo(struct addrinfo *res);
+ADL_RESULT adl_lib_getnameinfo(const struct sockaddr *addr,socklen_t addrlen,char *host,socklen_t hostlen,char *service,socklen_t servicelen,int flags);
+ADL_RESULT adl_lib_htons(u16 hostshort);
+ADL_RESULT adl_lib_htonl(u32 hostlong);
+ADL_RESULT adl_lib_ntohs(u16 netshort);
+ADL_RESULT adl_lib_ntohl(u32 netlong);
 
 
 

@@ -3,6 +3,6 @@
 
 #include "../include/os/os.h"
 
-void ADL_Os_library_init();
+void ADL_OS_library_init();
 
 #endif

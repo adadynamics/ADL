@@ -14,6 +14,72 @@
 
 
 
+
+
+/*
+
+ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
+    
+            a wrapper for the socket system call on unix systems
+            
+            INPUT  : domain(eg. AF_INET,AF_INET6),type(eg. SOCK_STREAM,SOCK_RAW),protocol(eg. IPPROTO_TCP)
+            OUTPUT : returns a ADL_RESULT structure
+
+
+            ****
+                on success the ret member of the structure contains a valid socket descriptor which is a positive integral value
+
+                on error the ret member of the structure is set to -1, the errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+
+
+bool adl_lib_SocketInit(void)
+{
+    return true;
+}
+
+
+
+
+
+
+
+
+/*
+
+ADL_RESULT adl_lib_socket(int domain,int type,int protocol);
+    
+            a wrapper for the socket system call on unix systems
+            
+            INPUT  : domain(eg. AF_INET,AF_INET6),type(eg. SOCK_STREAM,SOCK_RAW),protocol(eg. IPPROTO_TCP)
+            OUTPUT : returns a ADL_RESULT structure
+
+
+            ****
+                on success the ret member of the structure contains a valid socket descriptor which is a positive integral value
+
+                on error the ret member of the structure is set to -1, the errno member contains the error number and the errmsg member contains the description of the error
+            ****
+
+            ===>  NO DYNAMIC MEMORY IS USED
+*/
+
+
+
+
+bool adl_lib_SocketFini(void)
+{
+    return true;
+}
+
+
+
+
 /*
 
 ADL_RESULT adl_sys_socket(int domain,int type,int protocol);

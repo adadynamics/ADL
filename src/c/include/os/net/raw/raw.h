@@ -8,7 +8,7 @@ ADL_SOCKET sock;
 
 typedef struct ADL_RAWDEVICE
 {
-    ADL_SOCKFD sockfd;
+    ADL_SOCKET_DESC sockfd;
     struct ifreq ifr;
     ADL_RESULT (*open)  (struct ADL_RAWDEVICE *self,const char *device,u64 protocol);
     ADL_RESULT (*read)  (struct ADL_RAWDEVICE *self,void *buf,u64 buflen);

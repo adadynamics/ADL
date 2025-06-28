@@ -1,4 +1,5 @@
 #include "file/file.h"
+#include "net/net.h"
 
 
 #ifdef ADL_OS_WINDOWS
@@ -12,6 +13,47 @@ void ADL_WINDOWS_Init(ADL_WINDOWS *class)
     {
         ADL_RETURN_DEFER(null_class);
     }
+
+
+    class->SocketInit                  = adl_lib_SocketInit;
+    class->SocketFini                  = adl_lib_SocketFini;
+    class->socket                      = adl_lib_socket;
+    /**
+	class->socketpair                  = adl_lib_socketpair;
+	*/
+    class->bind                        = adl_lib_bind;
+	class->connect                     = adl_lib_connect;
+	class->listen                      = adl_lib_listen;
+	class->accept                      = adl_lib_accept;
+	/**
+    class->accept4                     = adl_lib_accept4;
+	*/
+    class->recv                        = adl_lib_recv;
+	class->recvfrom                    = adl_lib_recvfrom;
+    /**
+	class->recvmsg                     = adl_lib_recvmsg;
+    class->recvmmsg                    = adl_lib_recvmmsg;
+    */
+	class->send                        = adl_lib_send;
+	class->sendto                      = adl_lib_sendto;
+	/**
+    class->sendmsg                     = adl_lib_sendmsg;
+	class->sendmmsg                    = adl_lib_sendmmsg;
+	*/
+    class->shutdown                    = adl_lib_shutdown;
+	class->close                       = adl_lib_closesocket;
+	class->getsockopt                  = adl_lib_getsockopt;
+	class->setsockopt                  = adl_lib_setsockopt;
+	class->getsockname                 = adl_lib_getsockname;
+	class->getpeername                 = adl_lib_getpeername;
+	class->getaddrinfo                 = adl_lib_getaddrinfo;
+	class->freeaddrinfo                = adl_lib_freeaddrinfo;
+	class->getnameinfo                 = adl_lib_getnameinfo;
+	class->htons                       = adl_lib_htons;
+	class->htonl                       = adl_lib_htonl;
+	class->ntohs                       = adl_lib_ntohs;
+	class->ntohl                       = adl_lib_ntohl;
+
 
     /*
         MISCELLENIOUS

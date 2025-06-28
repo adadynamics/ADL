@@ -279,7 +279,8 @@ void ADL_UNIX_Init(ADL_UNIX *class)
         ADL_RETURN_DEFER(null_class);
     }
 
-
+    class->SocketInit                                      = adl_lib_SocketInit;
+    class->SocketFini                                      = adl_lib_SocketFini;
     class->socket                                          = adl_sys_socket;
     class->socketpair                                      = adl_sys_socketpair;
     class->bind                                            = adl_sys_bind;

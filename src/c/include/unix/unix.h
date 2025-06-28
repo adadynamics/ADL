@@ -103,11 +103,27 @@
 #include <shadow.h>
 
 
+#ifndef ADL_SOCKET_DESC
+#define ADL_SOCKET_DESC int
+#endif
+
+#ifndef ADL_INVALID_SOCKET
+#define ADL_INVALID_SOCKET -1
+#endif
+
+
+#ifndef ADL_SOCKET_ERRNO
+#define ADL_SOCKET_ERRNO errno
+#endif
+
+
 
 
 
 typedef struct ADL_UNIX
 {
+    bool (*SocketInit)(void);
+    bool (*SocketFini)(void);
     ADL_RESULT (*socket)(int domain,int type,int protocol);
     ADL_RESULT (*socketpair)(int domain,int type,int protocol,int sockfds[2]);
     ADL_RESULT (*bind)(int sockfd,const struct sockaddr *addr,socklen_t addrlen);
