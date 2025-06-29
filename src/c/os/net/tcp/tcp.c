@@ -134,6 +134,7 @@ null_self:
 
 ADL_RESULT Send(struct ADL_TCP_CLIENT *self,ADL_NET_MESSAGE message)
 {
+    puts("Seeeeeeeeeend");
     ADL_RESULT_INIT(rdr_res);
 
     if(ADL_CHECK_NULL(self) || ADL_CHECK_NULL(message.buffer))
