@@ -70,3 +70,10 @@ null_class:
     return;
 }
 
+
+ADL_SOCKET adl_socket;
+
+void ADL_SOCKET_library_init()
+{
+	ADL_SOCKET_Init(&adl_socket);
+}

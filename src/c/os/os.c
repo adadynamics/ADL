@@ -14,6 +14,8 @@ void ADL_SOCKET_WINDOWS_library_init();
 void ADL_SOCKET_LINUX_library_init();
 
 
+void ADL_SOCKET_library_init();
+
 /*
 void ADL_FILE_LINUX_library_init();
 
@@ -34,6 +36,7 @@ void ADL_OS_library_init(void)
     ADL_SOCKET_WINDOWS_library_init();
     puts("here");
     #endif
+    ADL_SOCKET_library_init();
 /**
     ADL_FILE_LINUX_library_init();
     ADL_FILE_Library_init();

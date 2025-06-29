@@ -21,12 +21,16 @@ void ADL_SOCKET_WINDOWS_Init(ADL_SOCKET_WINDOWS *class)
     }
 
     class->socket                      = adl_os.socket;
+/**
 	class->socketpair                  = adl_os.socketpair;
+*/
 	class->bind                        = adl_os.bind;
 	class->connect                     = adl_os.connect;
 	class->listen                      = adl_os.listen;
 	class->accept                      = adl_os.accept;
+/**
 	class->accept4                     = adl_os.accept4;
+*/
 	class->recv                        = adl_os.recv;
 	class->recvfrom                    = adl_os.recvfrom;
 	/**

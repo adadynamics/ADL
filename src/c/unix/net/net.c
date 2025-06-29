@@ -106,7 +106,13 @@ ADL_RESULT adl_sys_socket(int domain,int type,int protocol)
 {
 
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SOCKET(domain,type,protocol);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -141,7 +147,13 @@ ADL_RESULT adl_sys_socketpair(int domain,int type,int protocol,int sockfds[2]);
 ADL_RESULT adl_sys_socketpair(int domain,int type,int protocol,int sockfds[2])
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SOCKETPAIR(domain,type,protocol,sockfds);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -173,7 +185,13 @@ ADL_RESULT adl_sys_bind(int sockfd,const struct sockaddr *addr,socklen_t addrlen
 {
     
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_BIND(sockfd,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -205,7 +223,13 @@ ADL_RESULT adl_sys_connect(int sockfd,const struct sockaddr *addr,socklen_t addr
 {
     
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_CONNECT(sockfd,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -236,7 +260,13 @@ ADL_RESULT adl_sys_listen(int sockfd,int backlog)
 {
     
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_LISTEN(sockfd,backlog);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -271,7 +301,13 @@ ADL_RESULT adl_sys_accept(int sockfd,struct sockaddr *addr,socklen_t *addrlen);
 ADL_RESULT adl_sys_accept(int sockfd,struct sockaddr *addr,socklen_t *addrlen)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_ACCEPT(sockfd,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -307,7 +343,13 @@ ADL_RESULT adl_sys_accept4(int sockfd,struct sockaddr *addr,socklen_t *addrlen,i
 ADL_RESULT adl_sys_accept4(int sockfd,struct sockaddr *addr,socklen_t *addrlen,int flags)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_ACCEPT4(sockfd,addr,addrlen,flags);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -338,7 +380,13 @@ ADL_RESULT adl_sys_recv(int sockfd,void *buf,size_t buflen,int flags);
 ADL_RESULT adl_sys_recv(int sockfd,void *buf,size_t buflen,int flags)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_RECV(sockfd,buf,buflen,flags);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -375,7 +423,13 @@ ADL_RESULT adl_sys_recvfrom(int sockfd,void *buf,size_t buflen,int flags,struct 
 {
 
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_RECVFROM(sockfd,buf,buflen,flags,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -405,7 +459,13 @@ ADL_RESULT adl_sys_recvmsg(int sockfd,struct msghdr *msg,int flags);
 ADL_RESULT adl_sys_recvmsg(int sockfd,struct msghdr *msg,int flags)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_RECVMSG(sockfd,msg,flags);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -435,7 +495,13 @@ ADL_RESULT adl_sys_recvmmsg(int sockfd,struct mmsghdr *msgvec,int vlen,int flags
 ADL_RESULT adl_sys_recvmmsg(int sockfd,struct mmsghdr *msgvec,int vlen,int flags,struct timespec *timeout)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_RECVMMSG(sockfd,msgvec,vlen,flags,timeout);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -466,7 +532,13 @@ ADL_RESULT adl_sys_send(int sockfd,const void *buf,size_t buflen,int flags);
 ADL_RESULT adl_sys_send(int sockfd,const void *buf,size_t buflen,int flags)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SEND(sockfd,buf,buflen,flags);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -499,7 +571,13 @@ ADL_RESULT adl_sys_sendto(int sockfd,const void *buf,size_t buflen,int flags,str
 ADL_RESULT adl_sys_sendto(int sockfd,const void *buf,size_t buflen,int flags,struct sockaddr *addr,socklen_t addrlen)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SENDTO(sockfd,buf,buflen,flags,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -529,7 +607,13 @@ ADL_RESULT adl_sys_sendmsg(int sockfd,const struct msghdr *msg,int flags);
 ADL_RESULT adl_sys_sendmsg(int sockfd,const struct msghdr *msg,int flags)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SENDMSG(sockfd,msg,flags);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -559,7 +643,13 @@ ADL_RESULT adl_sys_sendmmsg(int sockfd,struct mmsghdr *msgvec,int vlen,int flags
 ADL_RESULT adl_sys_sendmmsg(int sockfd,struct mmsghdr *msgvec,int vlen,int flags)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SENDMMSG(sockfd,msgvec,vlen,flags);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -589,7 +679,13 @@ ADL_RESULT adl_sys_shutdown(int sockfd,int how);
 ADL_RESULT adl_sys_shutdown(int sockfd,int how)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SHUTDOWN(sockfd,how);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -619,7 +715,13 @@ ADL_RESULT adl_sys_close(int sockfd);
 ADL_RESULT adl_sys_close(int fd)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_CLOSE(fd);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -653,7 +755,13 @@ ADL_RESULT adl_sys_getsockopt(int sockfd,int level,int optname,void *optval,sock
 ADL_RESULT adl_sys_getsockopt(int sockfd,int level,int optname,void *optval,socklen_t *optlen)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_GETSOCKOPT(sockfd,level,optname,optval,optlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -687,7 +795,13 @@ ADL_RESULT adl_sys_setsockopt(int sockfd,int level,int optname,void *optval,sock
 ADL_RESULT adl_sys_setsockopt(int sockfd,int level,int optname,void *optval,socklen_t optlen)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_SETSOCKOPT(sockfd,level,optname,optval,optlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -722,7 +836,13 @@ ADL_RESULT adl_sys_getsockname(int sockfd,struct sockaddr *addr,socklen_t *addrl
 ADL_RESULT adl_sys_getsockname(int sockfd,struct sockaddr *addr,socklen_t *addrlen)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_GETSOCKNAME(sockfd,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -757,7 +877,13 @@ ADL_RESULT adl_sys_getpeername(int sockfd,struct sockaddr *addr,socklen_t *addrl
 ADL_RESULT adl_sys_getpeername(int sockfd,struct sockaddr *addr,socklen_t *addrlen)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_GETPEERNAME(sockfd,addr,addrlen);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -827,7 +953,13 @@ ADL_RESULT adl_lib_freeaddrinfo(struct addrinfo *res)
         rdr_ret = -1;
     }
 
+
+    adl_restart_syscall:
     ADL_FREEADDRINFO(res);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -891,7 +1023,13 @@ ADL_RESULT adl_lib_htons(u16 hostshort);
 ADL_RESULT adl_lib_htons(u16 hostshort)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_HTONS(hostshort);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -919,7 +1057,13 @@ ADL_RESULT adl_lib_htonl(u32 hostlong);
 ADL_RESULT adl_lib_htonl(u32 hostlong)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_HTONL(hostlong);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -947,7 +1091,13 @@ ADL_RESULT adl_lib_ntohs(u16 netshort);
 ADL_RESULT adl_lib_ntohs(u16 netshort)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_NTOHS(netshort);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
@@ -975,7 +1125,13 @@ ADL_RESULT adl_lib_ntohl(u32 netlong);
 ADL_RESULT adl_lib_ntohl(u32 netlong)
 {
     ADL_UNIX_INIT(rdr_ret,rdr_retptr);
+
+    adl_restart_syscall:
     rdr_ret = ADL_NTOHL(netlong);
+    if(ADL_CHECK_EQUAL(rdr_ret,-1) && ADL_CHECK_EQUAL(ADL_SOCKET_ERRNO,EINTR))
+    {
+        ADL_RETURN_DEFER(adl_restart_syscall);
+    }
     ADL_UNIX_FINI(rdr_ret,rdr_retptr);
 }
 
