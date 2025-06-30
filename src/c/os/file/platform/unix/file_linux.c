@@ -3,6 +3,7 @@
 
 #ifdef ADL_OS_UNIX
 
+extern ADL_UNIX adl_os;
 
 void ADL_FILE_LINUX_init(ADL_FILE_LINUX *class)
 {
@@ -173,7 +174,7 @@ ADL_FILE_LINUX file_os;
 
 void ADL_FILE_LINUX_library_init()
 {
-    ADL_FILE_LINUX_init(&file_linux);
+    ADL_FILE_LINUX_init(&file_os);
 }
 
 

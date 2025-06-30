@@ -84,7 +84,8 @@ ADL_RESULT Open(const char *path,ADL_FILE_ARGS args);
 ADL_RESULT Close(ADL_FILE_DESC fd);
 ADL_RESULT Read(ADL_FILE_DESC fd,void *buf,u64 buf_size);
 ADL_RESULT Write(ADL_FILE_DESC fd,const void *buf,u64 buf_size);
-
+ADL_RESULT ReadAll(ADL_FILE_DESC fd,void *buf,u64 buf_size);
+ADL_RESULT WriteAll(ADL_FILE_DESC fd,const void *buf,u64 buf_size);
 
 
 ADL_RESULT Seek(ADL_FILE_DESC fd,s64 offset,s32 origin);

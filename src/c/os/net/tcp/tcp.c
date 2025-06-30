@@ -134,7 +134,6 @@ null_self:
 
 ADL_RESULT Send(struct ADL_TCP_CLIENT *self,ADL_NET_MESSAGE message)
 {
-    puts("Seeeeeeeeeend");
     ADL_RESULT_INIT(rdr_res);
 
     if(ADL_CHECK_NULL(self) || ADL_CHECK_NULL(message.buffer))
@@ -150,7 +149,6 @@ ADL_RESULT Send(struct ADL_TCP_CLIENT *self,ADL_NET_MESSAGE message)
     buffer_tmp = message.buffer;
     size_tmp   = message.buffer_size;
 
-    printf("buffer_tmp  : %s\n",(char *)buffer_tmp);
     while(1)
     {
         rdr_res = adl_socket.send(self->client_fd,buffer_tmp,size_tmp,0);

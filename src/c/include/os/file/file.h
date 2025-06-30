@@ -74,8 +74,31 @@ typedef struct ADL_IOVEC
 	u64 len;
 }ADL_IOVEC;
 
+
+#define S_IFDIR 0x4000
+#define S_IFREG 0x8000
+
+#define S_ISDIR(x)  (x) & S_IFDIR
+#define S_ISREG(x)  (x) & S_IFREG
+
+#define S_IWUSR 0x0100
+
+
+
+
 #endif
 
+
+typedef enum ADL_FILE_TYPE
+{
+	ADL_FILE_TYPE_UNKNOWN,
+	ADL_FILE_TYPE_REGULAR,
+	ADL_FILE_TYPE_DIRECTORY,
+#if defined(ADL_OS_UNIX)
+	ADL_FILE_TYPE_PIPE,
+#endif
+
+}ADL_FILE_TYPE;
 
 #ifdef ADL_OS_TIMESPEC_UNDEFINED
 struct timespec 
@@ -136,6 +159,8 @@ typedef struct ADL_FILE
 	ADL_RESULT (*Close)(ADL_FILE_DESC fd);
 	ADL_RESULT (*Read)(ADL_FILE_DESC fd,void *buf,u64 buf_size);
 	ADL_RESULT (*Write)(ADL_FILE_DESC fd,const void *buf,u64 buf_size);
+	ADL_RESULT (*ReadAll)(ADL_FILE_DESC fd,void *buf,u64 buf_size);
+	ADL_RESULT (*WriteAll)(ADL_FILE_DESC fd,const void *buf,u64 buf_size);
 
 
 	
