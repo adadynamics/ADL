@@ -282,6 +282,13 @@ ADL_RESULT Stat(const char *path,ADL_STAT *info)
 #elif defined(ADL_OS_WINDOWS)
 	
 	ADL_FILE_ARGS args;
+	args.access       = GENERIC_READ;
+	args.share_mode   = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+	args.sa           = NULL;
+	args.create       = OPEN_EXISTING;
+	args.attrs_flags  = FILE_ATTRIBUTE_NORMAL;
+	args.template     = NULL;
+	
     rdr_res = Open(path,args);
 
 	if(ADL_RESULT_CHECK_ERROR(rdr_res))
@@ -425,6 +432,12 @@ ADL_RESULT Lstat(const char *path,ADL_STAT *info)
 #elif defined(ADL_OS_WINDOWS)
 	
 	ADL_FILE_ARGS args;
+	args.access       = GENERIC_READ;
+	args.share_mode   = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+	args.sa           = NULL;
+	args.create       = OPEN_EXISTING;
+	args.attrs_flags  = FILE_ATTRIBUTE_NORMAL;
+	args.template     = NULL;
 	args.attrs_flags |= FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT;
 
     rdr_res = Open(path,args);
