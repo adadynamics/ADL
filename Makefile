@@ -24,7 +24,7 @@ UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_
 
 ADL_WINDOWS_LIB = $(TARGET)/libwinadl.a
 
-WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/net.o $(WINDOWS_OBJ)/windows.o $(WINDOWS_OBJ)/os.o  $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o $(OS_OBJ)/windows_socket_windows.o $(OS_OBJ)/windows_socket.o $(OS_OBJ)/windows_tcp.o
+WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/net.o $(WINDOWS_OBJ)/thread.o $(WINDOWS_OBJ)/windows.o $(WINDOWS_OBJ)/os.o  $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o $(OS_OBJ)/windows_socket_windows.o $(OS_OBJ)/windows_socket.o $(OS_OBJ)/windows_tcp.o $(OS_OBJ)/windows_thread_windows.o $(OS_OBJ)/windows_thread.o
 
 windows_install: $(ADL_WINDOWS_LIB)
 	sudo cp $(ADL_WINDOWS_LIB) /usr/i686-w64-mingw32/lib
@@ -36,6 +36,16 @@ $(ADL_WINDOWS_LIB): $(WINDOWS_OBJECTS)
 	sudo rm -rf /usr/i686-w64-mingw32/lib/libwinadl.a
 	sudo rm -rf $(ADL_WINDOWS_LIB)
 	ar -rcsv $@ $^
+
+
+
+
+
+$(OS_OBJ)/windows_thread.o: $(SRC_C)/os/thread/thread.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/windows_thread_windows.o: $(SRC_C)/os/thread/platform/windows/thread_windows.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 
 $(OS_OBJ)/windows_tcp.o: $(SRC_C)/os/net/tcp/tcp.c
@@ -62,6 +72,9 @@ $(WINDOWS_OBJ)/os.o: $(SRC_C)/os/os.c
 $(WINDOWS_OBJ)/windows.o: $(SRC_C)/windows/windows.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
+
+$(WINDOWS_OBJ)/thread.o: $(SRC_C)/windows/thread/thread.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 $(WINDOWS_OBJ)/net.o: $(SRC_C)/windows/net/net.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@

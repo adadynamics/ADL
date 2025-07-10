@@ -1,5 +1,6 @@
 #include "file/file.h"
 #include "net/net.h"
+#include "thread/thread.h"
 
 
 #ifdef ADL_OS_WINDOWS
@@ -171,6 +172,55 @@ void ADL_WINDOWS_Init(ADL_WINDOWS *class)
     //class->FindFirstFileEx                                         = adl_lib_FindFirstFileEx;
     class->FindNextFile                                              = adl_lib_FindNextFile;
     class->FindClose                                                 = adl_lib_FindClose;
+
+
+
+
+
+
+
+
+
+
+
+
+    class->CreateThread                                              = adl_lib_CreateThread;
+    class->OpenThread                                                = adl_lib_OpenThread;
+    class->ExitThread                                                = adl_lib_ExitThread;
+    class->TerminateThread                                           = adl_lib_TerminateThread;
+    class->GetExitCodeThread                                         = adl_lib_GetExitCodeThread;
+    class->ResumeThread                                              = adl_lib_ResumeThread;
+    class->SuspendThread                                             = adl_lib_SuspendThread;
+    class->GetThreadDescription                                      = adl_lib_GetThreadDescription;
+    class->SetThreadDescription                                      = adl_lib_SetThreadDescription;
+    class->GetThreadTimes                                            = adl_lib_GetThreadTimes;
+    class->GetPriorityClass                                          = adl_lib_GetPriorityClass;
+    class->SetPriorityClass                                          = adl_lib_SetPriorityClass;
+    class->SetThreadPriority                                         = adl_lib_SetThreadPriority;
+    class->InitializeCriticalSection                                 = adl_lib_InitializeCriticalSection;
+    class->InitializeCriticalSectionEx                               = adl_lib_InitializeCriticalSectionEx;
+    class->InitializeCriticalSectionAndSpinCount                     = adl_lib_InitializeCriticalSectionAndSpinCount;
+    class->DeleteCriticalSection                                     = adl_lib_DeleteCriticalSection;
+    class->EnterCriticalSection                                      = adl_lib_EnterCriticalSection;
+    class->TryEnterCriticalSection                                   = adl_lib_TryEnterCriticalSection;
+    class->LeaveCriticalSection                                      = adl_lib_LeaveCriticalSection;
+    class->CreateMutex                                               = adl_lib_CreateMutex;
+    class->CreateMutexEx                                             = adl_lib_CreateMutexEx;
+    class->OpenMutex                                                 = adl_lib_OpenMutex;
+    class->WaitForSingleObject                                       = adl_lib_WaitForSingleObject;
+    class->ReleaseMutex                                              = adl_lib_ReleaseMutex;
+    class->CreateSemaphore                                           = adl_lib_CreateSemaphore;
+    class->CreateSemaphoreEx                                         = adl_lib_CreateSemaphoreEx;
+    class->OpenSemaphore                                             = adl_lib_OpenSemaphore;
+    class->ReleaseSemaphore                                          = adl_lib_ReleaseSemaphore;
+    class->CreateEvent                                               = adl_lib_CreateEvent;
+    class->CreateEventEx                                             = adl_lib_CreateEventEx;
+    class->OpenEvent                                                 = adl_lib_OpenEvent;
+    class->SetEvent                                                  = adl_lib_SetEvent;
+    class->ResetEvent                                                = adl_lib_ResetEvent;
+    class->PulseEvent                                                = adl_lib_PulseEvent;
+
+
 
 
 null_class:

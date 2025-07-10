@@ -1,9 +1,11 @@
-#ifndef ADL_OS_THREAD_PTHREAD_LINUX
-#define ADL_OS_THREAD_PTHREAD_LINUX
+#ifndef ADL_SRC_OS_THREAD_PLATFORM_UNIX_PTHREAD_LINUX
+#define ADL_SRC_OS_THREAD_PLATFORM_UNIX_PTHREAD_LINUX
 
-#include "../os.h"
+#include "../../../os.h"
 
 
+
+#ifdef ADL_OS_UNIX
 
 
 
@@ -77,5 +79,8 @@ typedef struct ADL_PTHREAD_LINUX
 void ADL_PTHREAD_LINUX_init(ADL_PTHREAD_LINUX *pthread);
 
 void ADL_PTHREAD_LINUX_fini(ADL_PTHREAD_LINUX *pthread);
+
+
+#endif
 
 #endif

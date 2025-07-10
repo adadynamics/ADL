@@ -1,39 +1,21 @@
-#ifndef ADL_OS_THREAD_THREAD_H
-#define ADL_OS_THREAD_THREAD_H
+#ifndef ADL_SRC_OS_THREAD_THREAD_H
+#define ADL_SRC_OS_THREAD_THREAD_H
+
+#include "../../include/os/thread/thread.h"
+#include "platform/unix/pthread_linux.h"
+#include "platform/windows/thread_windows.h"
 
 
 
-
-#include "pthread_linux.h"
-
-
-
-
-typedef struct ADL_THREAD_ID
-{
-    pthread_t tid;
-}ADL_THREAD_ID;
-
-typedef struct ADL_THREAD
-{
-    ADL_THREAD_ID id;
-    ADL_RESULT (*start)(struct ADL_THREAD *self,void *(*start_routine)(void *arg),void *arg);
-    ADL_RESULT (*detach)(struct ADL_THREAD *self);
-    ADL_RESULT (*join)(struct ADL_THREAD *self,void **retval);
-    ADL_RESULT (*exit)(struct ADL_THREAD *self,void *status);
-    ADL_RESULT (*get_name)(struct ADL_THREAD *self);
-    ADL_RESULT (*set_name)(struct ADL_THREAD *self,ADL_STRING name);
-    ADL_RESULT (*get_tid)(struct ADL_THREAD *self);
-    ADL_RESULT (*is_alive)(struct ADL_THREAD *self);
-}ADL_THREAD;
+ADL_RESULT Start(ADL_THREAD *self,u64 (*start_routine)(void *arg),void *arg);
+ADL_RESULT Detach(ADL_THREAD *self);
+ADL_RESULT Join(ADL_THREAD *self,void **retval);
+ADL_RESULT Exit(ADL_THREAD *self,void *status);
+ADL_RESULT GetName(ADL_THREAD *self);
+ADL_RESULT SetName(ADL_THREAD *self,ADL_STRING name);
+ADL_RESULT GetId(ADL_THREAD *self);
+ADL_RESULT IsAlive(ADL_THREAD *self);
 
 
-extern ADL_PTHREAD_LINUX pthread_linux;
-
-
-
-void ADL_THREAD_init(ADL_THREAD *thread);
-
-void ADL_THREAD_fini(ADL_THREAD *thread);
 
 #endif

@@ -69,7 +69,7 @@
 #define __LPVOID__
 #define __UINT__
 #define __VOID__
-#define __
+#define __HRESULT__
 
 
 
