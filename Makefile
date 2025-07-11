@@ -19,12 +19,12 @@ WINDOWS_LINK = -lws2_32
 OS_OBJ  = $(TARGET)/obj/os
 
 
-UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o $(UNIX_OBJ)/os.o  $(OS_OBJ)/unix_file_linux.o $(OS_OBJ)/unix_file.o    $(OS_OBJ)/unix_socket_linux.o $(OS_OBJ)/unix_socket.o $(OS_OBJ)/unix_tcp.o 
+UNIX_OBJECTS = $(UNIX_OBJ)/string.o $(UNIX_OBJ)/file.o $(UNIX_OBJ)/ipc.o $(UNIX_OBJ)/memory.o $(UNIX_OBJ)/net.o $(UNIX_OBJ)/process.o $(UNIX_OBJ)/signal.o $(UNIX_OBJ)/sys.o $(UNIX_OBJ)/thread.o $(UNIX_OBJ)/time.o $(UNIX_OBJ)/user.o $(UNIX_OBJ)/unix.o $(UNIX_OBJ)/os.o  $(OS_OBJ)/unix_file_linux.o $(OS_OBJ)/unix_file.o    $(OS_OBJ)/unix_socket_linux.o $(OS_OBJ)/unix_socket.o $(OS_OBJ)/unix_tcp.o $(OS_OBJ)/unix_tcpclient.o $(OS_OBJ)/unix_tcpserver.o $(OS_OBJ)/unix_pthread_linux.o $(OS_OBJ)/unix_thread.o $(OS_OBJ)/unix_spinlock.o
 
 
 ADL_WINDOWS_LIB = $(TARGET)/libwinadl.a
 
-WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/net.o $(WINDOWS_OBJ)/thread.o $(WINDOWS_OBJ)/windows.o $(WINDOWS_OBJ)/os.o  $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o $(OS_OBJ)/windows_socket_windows.o $(OS_OBJ)/windows_socket.o $(OS_OBJ)/windows_tcp.o $(OS_OBJ)/windows_thread_windows.o $(OS_OBJ)/windows_thread.o
+WINDOWS_OBJECTS = $(WINDOWS_OBJ)/string.o $(WINDOWS_OBJ)/file.o $(WINDOWS_OBJ)/net.o $(WINDOWS_OBJ)/thread.o $(WINDOWS_OBJ)/windows.o $(WINDOWS_OBJ)/os.o  $(OS_OBJ)/windows_file_windows.o $(OS_OBJ)/windows_file.o $(OS_OBJ)/windows_socket_windows.o $(OS_OBJ)/windows_socket.o $(OS_OBJ)/windows_tcp.o $(OS_OBJ)/windows_tcpclient.o $(OS_OBJ)/windows_tcpserver.o $(OS_OBJ)/windows_thread_windows.o $(OS_OBJ)/windows_thread.o $(OS_OBJ)/windows_spinlock.o
 
 windows_install: $(ADL_WINDOWS_LIB)
 	sudo cp $(ADL_WINDOWS_LIB) /usr/i686-w64-mingw32/lib
@@ -41,10 +41,20 @@ $(ADL_WINDOWS_LIB): $(WINDOWS_OBJECTS)
 
 
 
+$(OS_OBJ)/windows_spinlock.o: $(SRC_C)/os/thread/spinlock.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
 $(OS_OBJ)/windows_thread.o: $(SRC_C)/os/thread/thread.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 $(OS_OBJ)/windows_thread_windows.o: $(SRC_C)/os/thread/platform/windows/thread_windows.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+
+$(OS_OBJ)/windows_tcpserver.o: $(SRC_C)/os/net/tcp/tcpserver.c
+	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/windows_tcpclient.o: $(SRC_C)/os/net/tcp/tcpclient.c
 	$(WINDOWS_CC) $(WINDOWS_FLAGS) $(WINDOWS_DEFINES)-c $< -o $@
 
 
@@ -102,6 +112,24 @@ $(ADL_UNIX_LIB): $(UNIX_OBJECTS)
 
 
 
+
+
+
+$(OS_OBJ)/unix_spinlock.o: $(SRC_C)/os/thread/spinlock.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/unix_thread.o: $(SRC_C)/os/thread/thread.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/unix_pthread_linux.o: $(SRC_C)/os/thread/platform/unix/pthread_linux.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
+
+
+$(OS_OBJ)/unix_tcpserver.o: $(SRC_C)/os/net/tcp/tcpserver.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
+
+$(OS_OBJ)/unix_tcpclient.o: $(SRC_C)/os/net/tcp/tcpclient.c
+	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@
 
 $(OS_OBJ)/unix_tcp.o: $(SRC_C)/os/net/tcp/tcp.c
 	$(UNIX_CC) $(UNIX_FLAGS) $(UNIX_DEFINES)-c $< -o $@

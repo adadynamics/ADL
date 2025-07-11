@@ -76,9 +76,9 @@ typedef struct ADL_PTHREAD_LINUX
 }ADL_PTHREAD_LINUX;
 
 
-void ADL_PTHREAD_LINUX_init(ADL_PTHREAD_LINUX *pthread);
+void ADL_PTHREAD_LINUX_Init(ADL_PTHREAD_LINUX *pthread);
 
-void ADL_PTHREAD_LINUX_fini(ADL_PTHREAD_LINUX *pthread);
+void ADL_PTHREAD_LINUX_Fini(ADL_PTHREAD_LINUX *pthread);
 
 
 #endif

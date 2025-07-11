@@ -7,7 +7,7 @@ extern ADL_PTHREAD_LINUX pthread_linux;
 extern ADL_THREAD_WINDOWS thread_windows;
 #endif
 
-ADL_RESULT Start(ADL_THREAD *self,u64 (*start_routine)(void *arg),void *arg)
+ADL_RESULT Start(ADL_THREAD *self,ADL_THREAD_ROUTINE start_routine,void *arg)
 {
     ADL_RESULT_INIT(rdr_res);
     if(ADL_CHECK_NULL(self))
@@ -16,9 +16,9 @@ ADL_RESULT Start(ADL_THREAD *self,u64 (*start_routine)(void *arg),void *arg)
     }
 
 #if defined(ADL_OS_UNIX)
-    rdr_res = pthread_linux.pthread_create(&self->id.tid,NULL,(u64 (*)(void *))start_routine,arg);
+    rdr_res = pthread_linux.pthread_create(&self->id.tid,NULL,(ADL_THREAD_ROUTINE)start_routine,arg);
 #elif defined(ADL_OS_WINDOWS)
-    rdr_res = thread_windows.CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)start_routine,arg,0,&self->id.tid);
+    rdr_res = thread_windows.CreateThread(NULL,0,(ADL_THREAD_ROUTINE)start_routine,arg,0,&self->id.tid);
     self->id.handle = rdr_res.ptr;
 #endif
 
@@ -153,6 +153,9 @@ void ADL_THREAD_Init(ADL_THREAD *class)
     {
         ADL_RETURN_DEFER(null_class);
     }
+
+    class->id          = (ADL_THREAD_ID){0};
+    class->exit_code   = 0;
 
     class->Start       = Start;
     class->Detach      = Detach;

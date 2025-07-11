@@ -191,8 +191,12 @@ void ADL_WINDOWS_Init(ADL_WINDOWS *class)
     class->GetExitCodeThread                                         = adl_lib_GetExitCodeThread;
     class->ResumeThread                                              = adl_lib_ResumeThread;
     class->SuspendThread                                             = adl_lib_SuspendThread;
+  
+    /*
     class->GetThreadDescription                                      = adl_lib_GetThreadDescription;
     class->SetThreadDescription                                      = adl_lib_SetThreadDescription;
+    */
+    
     class->GetThreadTimes                                            = adl_lib_GetThreadTimes;
     class->GetPriorityClass                                          = adl_lib_GetPriorityClass;
     class->SetPriorityClass                                          = adl_lib_SetPriorityClass;

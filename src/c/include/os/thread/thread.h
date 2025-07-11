@@ -16,10 +16,31 @@ typedef struct ADL_THREAD_ID
 #endif
 }ADL_THREAD_ID;
 
+
+#if defined(ADL_OS_UNIX)
+typedef void *(*ADL_THREAD_ROUTINE)(void *);
+#elif defined(ADL_OS_WINDOWS)
+typedef LPTHREAD_START_ROUTINE ADL_THREAD_ROUTINE;
+#endif
+
+
+#ifdef ADL_OS_UNIX
+#define ADL_THREAD_RETURN_PARAM void *
+#elif defined(ADL_OS_WINDOWS)
+#define ADL_THREAD_RETURN_PARAM DWORD __attribute__((stdcall))
+#endif
+
+#ifdef ADL_OS_UNIX
+#define ADL_THREAD_RETURN(arg) return arg
+#elif defined(ADL_OS_WINDOWS)
+#define ADL_THREAD_RETURN(arg) return (DWORD)arg
+#endif
+
 typedef struct ADL_THREAD
 {
     ADL_THREAD_ID id;
-    ADL_RESULT (*Start)(struct ADL_THREAD *self,u64 (*start_routine)(void *arg),void *arg);
+    s64 exit_code;
+    ADL_RESULT (*Start)(struct ADL_THREAD *self,ADL_THREAD_ROUTINE,void *arg);
     ADL_RESULT (*Detach)(struct ADL_THREAD *self);
     ADL_RESULT (*Join)(struct ADL_THREAD *self,void **retval);
     ADL_RESULT (*Exit)(struct ADL_THREAD *self,void *status);

@@ -20,8 +20,12 @@ void ADL_THREAD_WINDOWS_Init(ADL_THREAD_WINDOWS *class)
     class->GetExitCodeThread                                         = adl_os.GetExitCodeThread;
     class->ResumeThread                                              = adl_os.ResumeThread;
     class->SuspendThread                                             = adl_os.SuspendThread;
+    
+    /*
     class->GetThreadDescription                                      = adl_os.GetThreadDescription;
     class->SetThreadDescription                                      = adl_os.SetThreadDescription;
+    */
+    
     class->GetThreadTimes                                            = adl_os.GetThreadTimes;
     class->GetPriorityClass                                          = adl_os.GetPriorityClass;
     class->SetPriorityClass                                          = adl_os.SetPriorityClass;
@@ -67,5 +71,11 @@ null_class:
     return;
 }
 
+ADL_THREAD_WINDOWS thread_windows;
+
+void ADL_THREAD_WINDOWS_library_init()
+{
+    ADL_THREAD_WINDOWS_Init(&thread_windows);
+}
 
 #endif

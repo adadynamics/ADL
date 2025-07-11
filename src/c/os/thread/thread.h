@@ -7,7 +7,7 @@
 
 
 
-ADL_RESULT Start(ADL_THREAD *self,u64 (*start_routine)(void *arg),void *arg);
+ADL_RESULT Start(ADL_THREAD *self,ADL_THREAD_ROUTINE,void *arg);
 ADL_RESULT Detach(ADL_THREAD *self);
 ADL_RESULT Join(ADL_THREAD *self,void **retval);
 ADL_RESULT Exit(ADL_THREAD *self,void *status);
