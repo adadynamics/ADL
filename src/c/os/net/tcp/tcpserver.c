@@ -56,9 +56,20 @@ null_self:
     return rdr_res;
 }
 
+ADL_THREAD_RETURN_PARAM ADL_TCP_SERVER_HandleClient(void *client_arg)
+{
+	ADL_TCP_SERVER_HANDLE_CLIENT_ARG *arg = (ADL_TCP_SERVER_HANDLE_CLIENT_ARG *)client_arg;
+	if(ADL_CHECK_NULL(arg) || ADL_CHECK_NULL(arg->self))
+	{
+		ADL_RETURN_DEFER(null_client_arg);
+	}
 
+	arg->handle_client(arg->self,arg->client_fd);
+null_client_arg:
+	ADL_THREAD_RETURN(client_arg);
+}
 
-ADL_RESULT ADL_TCP_SERVER_Serve(struct ADL_TCP_SERVER *self,ADL_TCP_SERVER_HANDLE_CLIENT handle_client)
+ADL_RESULT ADL_TCP_SERVER_Serve(struct ADL_TCP_SERVER *self,void *(*handle_client)(ADL_TCP_SERVER *,ADL_SOCKET_DESC))
 {
     ADL_RESULT_INIT(rdr_res);
     puts("HERE");
@@ -90,9 +101,10 @@ ADL_RESULT ADL_TCP_SERVER_Serve(struct ADL_TCP_SERVER *self,ADL_TCP_SERVER_HANDL
         
         client_arg->self = self;
         client_arg->client_fd = ADL_RESULT_READ_CODE(rdr_res);
+        client_arg->handle_client = handle_client;
 
         
-        threads[count].Start(&threads[count],handle_client,client_arg);
+        threads[count].Start(&threads[count],ADL_TCP_SERVER_HandleClient,client_arg);
         //thread.Detach(&thread);
         count = (count + 1) % 10;
 
