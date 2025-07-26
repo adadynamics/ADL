@@ -223,7 +223,10 @@ void ADL_WINDOWS_Init(ADL_WINDOWS *class)
     class->SetEvent                                                  = adl_lib_SetEvent;
     class->ResetEvent                                                = adl_lib_ResetEvent;
     class->PulseEvent                                                = adl_lib_PulseEvent;
-
+    class->InitializeConditionVariable                               = adl_lib_InitializeConditionVariable;
+    class->SleepConditionVariableCS                                  = adl_lib_SleepConditionVariableCS;
+    class->WakeConditionVariable                                     = adl_lib_WakeConditionVariable;
+    class->WakeAllConditionVariable                                  = adl_lib_WakeAllConditionVariable;
 
 
 

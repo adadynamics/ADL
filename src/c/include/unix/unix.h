@@ -445,6 +445,9 @@ typedef struct ADL_UNIX
     ADL_RESULT (*getdomainname)(char *name,size_t len);
     ADL_RESULT (*sethostname)(const char *name,size_t len);
     ADL_RESULT (*gethostname)(char *name,size_t len);
+
+
+
     ADL_RESULT (*brk)(void *addr);
     ADL_RESULT (*sbrk)(intptr_t increment);
     ADL_RESULT (*madvise)(void *addr,size_t length,int advice);
@@ -541,7 +544,18 @@ typedef struct ADL_UNIX
     ADL_RESULT (*pthread_tryjoin_np)(pthread_t thread,void **retval);
     ADL_RESULT (*pthread_getattr_np)(pthread_t thread,pthread_attr_t *attr);
     ADL_RESULT (*pthread_getconcurrency)(void);
-
+	ADL_RESULT (*pthread_mutex_init)(pthread_mutex_t *mutex,const pthread_mutexattr_t *attr);
+	ADL_RESULT (*pthread_mutex_destroy)(pthread_mutex_t *mutex);
+	ADL_RESULT (*pthread_mutex_lock)(pthread_mutex_t *mutex);
+	ADL_RESULT (*pthread_mutex_trylock)(pthread_mutex_t *mutex);
+	ADL_RESULT (*pthread_mutex_timedlock)(pthread_mutex_t *mutex,const struct timespec *abstime);
+	ADL_RESULT (*pthread_mutex_unlock)(pthread_mutex_t *mutex);
+	ADL_RESULT (*pthread_cond_init)(pthread_cond_t *cond, const pthread_condattr_t *attr);
+	ADL_RESULT (*pthread_cond_destroy)(pthread_cond_t *cond);
+	ADL_RESULT (*pthread_cond_wait)(pthread_cond_t *cond, pthread_mutex_t *mutex);
+	ADL_RESULT (*pthread_cond_timedwait)(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
+	ADL_RESULT (*pthread_cond_signal)(pthread_cond_t *cond);
+	ADL_RESULT (*pthread_cond_broadcast)(pthread_cond_t *cond);
 
 
     ADL_RESULT (*getpwnam)(const char *name);

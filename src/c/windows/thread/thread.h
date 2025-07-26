@@ -184,6 +184,21 @@
 
 
 
+#ifndef ADL_INITIALIZECONDITIONVARIABLE
+#define ADL_INITIALIZECONDITIONVARIABLE InitializeConditionVariable
+#endif
+
+#ifndef ADL_SLEEPCONDITIONVARIABLECS
+#define ADL_SLEEPCONDITIONVARIABLECS SleepConditionVariableCS
+#endif
+
+#ifndef ADL_WAKECONDITIONVARIABLE
+#define ADL_WAKECONDITIONVARIABLE WakeConditionVariable
+#endif
+
+#ifndef ADL_WAKEALLCONDITIONVARIABLE
+#define ADL_WAKEALLCONDITIONVARIABLE WakeAllConditionVariable
+#endif
 
 
 
@@ -227,7 +242,10 @@ ADL_RESULT adl_lib_OpenEvent(DWORD access,DWORD inherit,LPCTSTR name);
 ADL_RESULT adl_lib_SetEvent(HANDLE handle);
 ADL_RESULT adl_lib_ResetEvent(HANDLE handle);
 ADL_RESULT adl_lib_PulseEvent(HANDLE handle);
-
+ADL_RESULT adl_lib_InitializeConditionVariable(PCONDITION_VARIABLE cv);
+ADL_RESULT adl_lib_SleepConditionVariableCS(PCONDITION_VARIABLE cv, PCRITICAL_SECTION cs, DWORD milli);
+ADL_RESULT adl_lib_WakeConditionVariable(PCONDITION_VARIABLE cv);
+ADL_RESULT adl_lib_WakeAllConditionVariable(PCONDITION_VARIABLE cv);
 
 #endif
 

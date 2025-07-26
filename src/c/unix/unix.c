@@ -603,6 +603,8 @@ void ADL_UNIX_Init(ADL_UNIX *class)
     class->getdomainname                                   = adl_sys_getdomainname;
     class->sethostname                                     = adl_sys_sethostname;
     class->gethostname                                     = adl_sys_gethostname;
+
+    
     class->brk                                             = adl_sys_brk;
     class->sbrk                                            = adl_sys_sbrk;
     class->madvise                                         = adl_sys_madvise;
@@ -700,6 +702,18 @@ void ADL_UNIX_Init(ADL_UNIX *class)
     class->pthread_tryjoin_np                              = adl_lib_pthread_tryjoin_np;
     class->pthread_getattr_np                              = adl_lib_pthread_getattr_np;
     class->pthread_getconcurrency                          = adl_lib_pthread_getconcurrency;
+    class->pthread_mutex_init                              = adl_lib_pthread_mutex_init;
+    class->pthread_mutex_destroy                           = adl_lib_pthread_mutex_destroy;
+    class->pthread_mutex_lock                              = adl_lib_pthread_mutex_lock;
+    class->pthread_mutex_trylock                           = adl_lib_pthread_mutex_trylock;
+    class->pthread_mutex_timedlock                         = adl_lib_pthread_mutex_timedlock;
+    class->pthread_mutex_unlock                            = adl_lib_pthread_mutex_unlock;
+    class->pthread_cond_init                               = adl_lib_pthread_cond_init;
+    class->pthread_cond_destroy                            = adl_lib_pthread_cond_destroy;
+    class->pthread_cond_wait                               = adl_lib_pthread_cond_wait;
+    class->pthread_cond_timedwait                          = adl_lib_pthread_cond_timedwait;
+    class->pthread_cond_signal                             = adl_lib_pthread_cond_signal;
+    class->pthread_cond_broadcast                          = adl_lib_pthread_cond_broadcast;
 
 
 

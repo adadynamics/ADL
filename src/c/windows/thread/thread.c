@@ -517,4 +517,46 @@ ADL_RESULT adl_lib_PulseEvent(HANDLE handle) __BOOL__
 }
 
 
+
+
+ADL_RESULT adl_lib_InitializeConditionVariable(PCONDITION_VARIABLE cv) __VOID__
+{
+    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_INITIALIZECONDITIONVARIABLE(cv);
+    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+ADL_RESULT adl_lib_SleepConditionVariableCS(PCONDITION_VARIABLE cv, PCRITICAL_SECTION cs, DWORD milli) __BOOL__
+{
+    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    BOOL status = ADL_SLEEPCONDITIONVARIABLECS(cv,cs,milli);
+
+    if(ADL_CHECK_EQUAL(status,FALSE))
+    {
+        rdr_ret = -1;
+    }
+
+    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+ADL_RESULT adl_lib_WakeConditionVariable(PCONDITION_VARIABLE cv) __VOID__
+{
+    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WAKECONDITIONVARIABLE(cv);
+    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+ADL_RESULT adl_lib_WakeAllConditionVariable(PCONDITION_VARIABLE cv) __VOID__
+{
+    ADL_WINDOWS_INIT(rdr_ret,rdr_retptr);
+    ADL_WAKEALLCONDITIONVARIABLE(cv);
+    ADL_WINDOWS_FINI(rdr_ret,rdr_retptr);
+}
+
 #endif

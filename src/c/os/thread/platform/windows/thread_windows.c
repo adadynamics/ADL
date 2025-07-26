@@ -52,7 +52,10 @@ void ADL_THREAD_WINDOWS_Init(ADL_THREAD_WINDOWS *class)
     class->SetEvent                                                  = adl_os.SetEvent;
     class->ResetEvent                                                = adl_os.ResetEvent;
     class->PulseEvent                                                = adl_os.PulseEvent;
-
+    class->InitializeConditionVariable                               = adl_os.InitializeConditionVariable;
+    class->SleepConditionVariableCS                                  = adl_os.SleepConditionVariableCS;
+    class->WakeConditionVariable                                     = adl_os.WakeConditionVariable;
+    class->WakeAllConditionVariable                                  = adl_os.WakeAllConditionVariable;
 
 null_class:
     return;

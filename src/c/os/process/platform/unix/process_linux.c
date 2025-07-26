@@ -2,7 +2,7 @@
 
 
 
-
+#ifdef ADL_OS_UNIX
 
 void ADL_PROCESS_LINUX_init(ADL_PROCESS_LINUX *process_linux)
 {
@@ -114,4 +114,6 @@ void ADL_PROCESS_LINUX_fini(ADL_PROCESS_LINUX *process_linux)
 null_class:
     return;
 }
+
+#endif
 

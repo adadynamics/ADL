@@ -78,7 +78,18 @@ void ADL_PTHREAD_LINUX_Init(ADL_PTHREAD_LINUX *class)
     class->pthread_tryjoin_np                              = adl_os.pthread_tryjoin_np;
     class->pthread_getattr_np                              = adl_os.pthread_getattr_np;
     class->pthread_getconcurrency                          = adl_os.pthread_getconcurrency;
-
+    class->pthread_mutex_init                              = adl_os.pthread_mutex_init;
+    class->pthread_mutex_destroy                           = adl_os.pthread_mutex_destroy;
+    class->pthread_mutex_lock                              = adl_os.pthread_mutex_lock;
+    class->pthread_mutex_trylock                           = adl_os.pthread_mutex_trylock;
+    class->pthread_mutex_timedlock                         = adl_os.pthread_mutex_timedlock;
+    class->pthread_mutex_unlock                            = adl_os.pthread_mutex_unlock;
+    class->pthread_cond_init                               = adl_os.pthread_cond_init;
+    class->pthread_cond_destroy                            = adl_os.pthread_cond_destroy;
+    class->pthread_cond_wait                               = adl_os.pthread_cond_wait;
+    class->pthread_cond_timedwait                          = adl_os.pthread_cond_timedwait;
+    class->pthread_cond_signal                             = adl_os.pthread_cond_signal;
+    class->pthread_cond_broadcast                          = adl_os.pthread_cond_broadcast;
 null_class:
     return;
 }

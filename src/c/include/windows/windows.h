@@ -245,6 +245,10 @@ typedef struct ADL_WINDOWS
     ADL_RESULT (*SetEvent)(HANDLE handle);
     ADL_RESULT (*ResetEvent)(HANDLE handle);
     ADL_RESULT (*PulseEvent)(HANDLE handle);
+	ADL_RESULT (*InitializeConditionVariable)(PCONDITION_VARIABLE cv);
+	ADL_RESULT (*SleepConditionVariableCS)(PCONDITION_VARIABLE cv, PCRITICAL_SECTION cs, DWORD milli);
+	ADL_RESULT (*WakeConditionVariable)(PCONDITION_VARIABLE cv);
+	ADL_RESULT (*WakeAllConditionVariable)(PCONDITION_VARIABLE cv);
 
     
 

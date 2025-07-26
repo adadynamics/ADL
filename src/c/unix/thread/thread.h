@@ -324,6 +324,56 @@
 #endif
 
 
+#ifndef ADL_PTHREAD_MUTEX_INIT
+#define ADL_PTHREAD_MUTEX_INIT pthread_mutex_init
+#endif
+
+#ifndef ADL_PTHREAD_MUTEX_DESTROY
+#define ADL_PTHREAD_MUTEX_DESTROY pthread_mutex_destroy
+#endif
+
+#ifndef ADL_PTHREAD_MUTEX_LOCK
+#define ADL_PTHREAD_MUTEX_LOCK pthread_mutex_lock
+#endif
+
+#ifndef ADL_PTHREAD_MUTEX_TRYLOCK
+#define ADL_PTHREAD_MUTEX_TRYLOCK pthread_mutex_trylock
+#endif
+
+#ifndef ADL_PTHREAD_MUTEX_TIMEDLOCK
+#define ADL_PTHREAD_MUTEX_TIMEDLOCK pthread_mutex_timedlock
+#endif
+
+#ifndef ADL_PTHREAD_MUTEX_UNLOCK
+#define ADL_PTHREAD_MUTEX_UNLOCK pthread_mutex_unlock
+#endif
+
+
+
+#ifndef ADL_PTHREAD_COND_INIT
+#define ADL_PTHREAD_COND_INIT pthread_cond_init
+#endif
+
+#ifndef ADL_PTHREAD_COND_DESTROY
+#define ADL_PTHREAD_COND_DESTROY pthread_cond_destroy
+#endif
+
+#ifndef ADL_PTHREAD_COND_WAIT
+#define ADL_PTHREAD_COND_WAIT pthread_cond_wait
+#endif
+
+#ifndef ADL_PTHREAD_COND_TIMEDWAIT
+#define ADL_PTHREAD_COND_TIMEDWAIT pthread_cond_timedwait
+#endif
+
+#ifndef ADL_PTHREAD_COND_SIGNAL
+#define ADL_PTHREAD_COND_SIGNAL pthread_cond_signal
+#endif
+
+#ifndef ADL_PTHREAD_COND_BROADCAST
+#define ADL_PTHREAD_COND_BROADCAST pthread_cond_broadcast
+#endif
+
 
 
 ADL_RESULT adl_lib_pthread_attr_destroy(pthread_attr_t *attr);
@@ -388,9 +438,18 @@ ADL_RESULT adl_lib_pthread_getattr_default_np(pthread_attr_t *attr);
 ADL_RESULT adl_lib_pthread_tryjoin_np(pthread_t thread,void **retval);
 ADL_RESULT adl_lib_pthread_getattr_np(pthread_t thread,pthread_attr_t *attr);
 ADL_RESULT adl_lib_pthread_getconcurrency(void);
-
-
-
+ADL_RESULT adl_lib_pthread_mutex_init(pthread_mutex_t *mutex,const pthread_mutexattr_t *attr);
+ADL_RESULT adl_lib_pthread_mutex_destroy(pthread_mutex_t *mutex);
+ADL_RESULT adl_lib_pthread_mutex_lock(pthread_mutex_t *mutex);
+ADL_RESULT adl_lib_pthread_mutex_trylock(pthread_mutex_t *mutex);
+ADL_RESULT adl_lib_pthread_mutex_timedlock(pthread_mutex_t *mutex,const struct timespec *abstime);
+ADL_RESULT adl_lib_pthread_mutex_unlock(pthread_mutex_t *mutex);
+ADL_RESULT adl_lib_pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+ADL_RESULT adl_lib_pthread_cond_destroy(pthread_cond_t *cond);
+ADL_RESULT adl_lib_pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+ADL_RESULT adl_lib_pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
+ADL_RESULT adl_lib_pthread_cond_signal(pthread_cond_t *cond);
+ADL_RESULT adl_lib_pthread_cond_broadcast(pthread_cond_t *cond);
 
 
 #endif

@@ -1,0 +1,15 @@
+| Category           | Essential |
+| ------------------ | --------- |
+| Memory Management  | ✅         |
+| File + Filesystem  | ✅         |
+| Processes          | ✅         |
+| Threads + Sync     | ✅         |
+| IPC                | ✅         |
+| Networking         | ✅         |
+| Time + Timers      | ✅         |
+| Error Handling     | ✅         |
+| Signals + Events   | ✅         |
+| Standard IO        | ✅         |
+| System Info        | ✅         |
+| Low-Level / Unsafe | ✅         |
+

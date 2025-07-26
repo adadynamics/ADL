@@ -2210,6 +2210,111 @@ ADL_RESULT adl_lib_pthread_getconcurrency(void)
 
 
 
+ADL_RESULT adl_lib_pthread_mutex_init(pthread_mutex_t *mutex,const pthread_mutexattr_t *attr)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_MUTEX_INIT(mutex,attr);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+ADL_RESULT adl_lib_pthread_mutex_destroy(pthread_mutex_t *mutex)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_MUTEX_DESTROY(mutex);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+ADL_RESULT adl_lib_pthread_mutex_lock(pthread_mutex_t *mutex)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_MUTEX_LOCK(mutex);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+ADL_RESULT adl_lib_pthread_mutex_trylock(pthread_mutex_t *mutex)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_MUTEX_TRYLOCK(mutex);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+ADL_RESULT adl_lib_pthread_mutex_timedlock(pthread_mutex_t *mutex,const struct timespec *abstime)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_MUTEX_TIMEDLOCK(mutex,abstime);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+ADL_RESULT adl_lib_pthread_mutex_unlock(pthread_mutex_t *mutex)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_MUTEX_UNLOCK(mutex);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+
+
+
+
+ADL_RESULT adl_lib_pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_COND_INIT(cond,attr);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+ADL_RESULT adl_lib_pthread_cond_destroy(pthread_cond_t *cond)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_COND_DESTROY(cond);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+ADL_RESULT adl_lib_pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_COND_WAIT(cond,mutex);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+ADL_RESULT adl_lib_pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_COND_TIMEDWAIT(cond,mutex,abstime);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+ADL_RESULT adl_lib_pthread_cond_signal(pthread_cond_t *cond)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_COND_SIGNAL(cond);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
+
+
+ADL_RESULT adl_lib_pthread_cond_broadcast(pthread_cond_t *cond)
+{
+    ADL_UNIX_PTHREAD_INIT(rdr_ret,rdr_retptr);
+    rdr_ret = ADL_PTHREAD_COND_BROADCAST(cond);
+    ADL_UNIX_PTHREAD_FINI(rdr_ret,rdr_retptr);
+}
 
 
 
