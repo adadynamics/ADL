@@ -17,7 +17,7 @@ class Compile:
         buf += f"\t{self.compiler} $^ -o $@ "
 
         buf += f"\nclean:{self.name}.c\n"
-        buf += f"\trm -rf $<"
+        buf += f"\trm -rf $< Makefile"
         
         with open("Makefile","w") as file:
             file.write(buf)
