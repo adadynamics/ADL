@@ -7,6 +7,7 @@ class Parser:
         self.tokens = tokens
         self.size = len(self.tokens)
         self.programs = Programs()
+        self.in_impl = False
 
     def peek(self,ahead = 0):
         if self.index + ahead >= self.size:
@@ -98,6 +99,7 @@ class Parser:
     def parse_impl_decl(self):
         self.consume()
         impl = ImplDecl()
+        self.in_impl = True
 
         if self.peek().type != TokenType.TOKEN_IDENT:
             pass
@@ -121,8 +123,15 @@ class Parser:
         self.consume()
         fn = FnDecl()
 
-        if self.peek().type != TokenType.TOKEN_IDENT:
+        if self.peek().type == TokenType.TOKEN_KEYWORD_INIT and self.in_impl == False:
+            print(f"__init__ constructor used outside an impl declaration at row {self.peek().row} col {self.peek().col}")
+
+        elif self.peek().type == TokenType.TOKEN_KEYWORD_FINI and self.in_impl == False:
+            print(f"__fini__ constructor used outside an impl declaration at row {self.peek().row} col {self.peek().col}")
+
+        elif self.peek().type != TokenType.TOKEN_IDENT:
             pass
+
         fn.add_ident(self.consume())
 
         if self.consume().type != TokenType.TOKEN_LBRACE:
@@ -145,10 +154,10 @@ class Parser:
         fn.add_retparam(self.consume())
 
         if self.peek().type != TokenType.TOKEN_COLON:
+            print(f"no colon in {fn.ident.string}")
             pass
 
         fn.add_block(self.parse_block_stmt())
-
         return fn
     
     def parse_var_decl(self):
@@ -211,6 +220,9 @@ class Parser:
                 if self.peek(1).type == TokenType.TOKEN_LBRACE:
                     stmt.add_type(StmtType.STMT_FNCALL)
                     stmt.add_stmt(self.parse_fncall())
+                elif self.peek(1).type == TokenType.TOKEN_DOT:
+                    stmt.add_type(StmtType.STMT_STRUCT_ACCESS)
+                    stmt.add_stmt(self.parse_struct_access())
                 
                 elif self.peek(1).type == TokenType.TOKEN_ASSIGN:
                     stmt.add_type(StmtType.STMT_VARASSIGN)
@@ -248,20 +260,45 @@ class Parser:
     
     def parse_fncall(self):
         fn = FnCall()
-
+        print("---------------------testing---------------------")
+        print(self.peek().string)
         if self.peek().type != TokenType.TOKEN_IDENT:
             pass
+
         fn.add_ident(self.consume())
 
         if self.consume().type != TokenType.TOKEN_LBRACE:
             pass
-
-        fn.add_expr(self.parse_expr())
+        
+        while self.peek().type != TokenType.TOKEN_RBRACE:
+            fn.add_expr(self.parse_expr())
+            if self.peek().type == TokenType.TOKEN_COMMA:
+                self.consume()
 
         if self.consume().type != TokenType.TOKEN_RBRACE:
             pass
 
         return fn
+    
+    def parse_struct_access(self):
+        struct = StructAccess()
+
+        struct.left = self.consume()
+
+        if self.consume().type != TokenType.TOKEN_DOT:
+            pass
+
+        if self.peek(1).type == TokenType.TOKEN_LBRACE:
+            struct.add_type(StructAccessType.STRUCT_ACCESS_METHOD)
+            struct.right = self.parse_fncall()
+        else:
+            struct.add_type(StructAccessType.STRUCT_ACCESS_PROPERTY)
+            struct.right = self.parse_expr()
+
+        return struct
+
+
+
     
     def parse_if_stmt(self):
         If = IfStmt()
@@ -423,5 +460,43 @@ class Parser:
         return self.parse_primary_expr()
 
     def parse_primary_expr(self):
-        return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume()))
+
+        match self.peek().type:
+            case TokenType.TOKEN_KEYWORD_FALSE:
+                return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume(),LiteralType.LIT_FALSE))
+
+            case TokenType.TOKEN_KEYWORD_TRUE:
+                return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume(),LiteralType.LIT_TRUE))
+            
+            case TokenType.TOKEN_LITERAL_INT:
+                return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume(),LiteralType.LIT_INT))
+            
+            case TokenType.TOKEN_LITERAL_FLOAT:
+                return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume(),LiteralType.LIT_FLOAT))
+            
+            case TokenType.TOKEN_LITERAL_STRING:
+                return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume(),LiteralType.LIT_STRING))
+            
+            case TokenType.TOKEN_IDENT:
+                if self.peek(1).type == TokenType.TOKEN_LBRACE:
+                    return Expr(ExprType.EXPR_FNCALL,FnCallExpr(self.parse_fncall()))
+                elif self.peek(1).type == TokenType.TOKEN_RESOLUTION:
+                    left = self.consume()
+                    self.consume()
+                    right = self.parse_expr()
+                    return Expr(ExprType.EXPR_RESOLVED,ResolvedExpr(left,right))
+
+                return Expr(ExprType.EXPR_PRIMARY,PrimaryExpr(self.consume(),LiteralType.LIT_IDENT))
+            
+            
+            case TokenType.TOKEN_LBRACE:
+                self.consume()
+                expr = self.parse_expr()
+                if self.consume().type != TokenType.TOKEN_RBRACE:
+                    pass
+                return Expr(ExprType.EXPR_GROUPING,GroupingExpr(expr))
+
+
+
+
     

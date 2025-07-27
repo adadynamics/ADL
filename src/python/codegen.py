@@ -6,6 +6,7 @@ class Codegen:
         self.name = name
         print(name)
         self.file = open(name,"w")
+        self.file.write("#include <stdio.h>\n")
         self.source = ""
 
     def gen_programs(self):
@@ -51,15 +52,51 @@ class Codegen:
         self.source += "\n{"
 
         for varD in decl.varDs:
-            self.source += "\n\t" + varD.type.string + " " + varD.ident.string + ";"
+            type = self.programs.types.lookup(varD.type.string)
+            if type != None:
+                match type.type:
+                    case TypeType.TYPE_ENUM:
+                        type = "enum " + varD.type.string
+                    case TypeType.TYPE_STRUCT:
+                        type = "struct " + varD.type.string
+                    case _:
+                        type = varD.type.string
+            else:
+                        type = varD.type.string
+
+            self.source += "\n\t" + type + " " + varD.ident.string + ";"
 
         if decl.impl != None:
             print(f"fns {len(decl.impl.fns)}")
             for fn in decl.impl.fns:
-                self.source += "\n\t" + fn.retparam.string + " (*" + fn.ident.string + ")("
+                retparam = fn.retparam.string
+                tmp_retparam = self.programs.types.lookup(retparam)
+                if tmp_retparam != None:
+                    match tmp_retparam.type:
+                        case TypeType.TYPE_ENUM:
+                            retparam = "enum " + retparam
+                        case TypeType.TYPE_STRUCT:
+                            retparam = "struct " + retparam
+                        case _:
+                            retparam = fn.retparam.string
+
+                self.source += "\n\t" + retparam + " (*" + fn.ident.string + ")("
+                type = ""
                 for i in range(len(fn.args)):
                     arg = fn.args[i]
-                    self.source += arg.type.string + " " + arg.ident.string
+                    type = self.programs.types.lookup(arg.type.string)
+                    if type != None:
+                        match type.type:
+                            case TypeType.TYPE_ENUM:
+                                type = "enum " + arg.type.string
+                            case TypeType.TYPE_STRUCT:
+                                type = "struct " + arg.type.string
+                            case _:
+                                type = arg.type.string
+                    else:
+                        type = arg.type.string
+
+                    self.source += type + " " + arg.ident.string
                     if i < len(fn.args) - 1:
                         self.source += ","
                 
@@ -69,26 +106,94 @@ class Codegen:
 
         self.source += "\n};\n"
 
+        pre = decl.ident.string + "_"
+        tmp_src = "struct " + decl.ident.string + " " + pre + "Create(void){"
+        tmp_src = "\n\t struct " +decl.ident.string + " " + "self;"
+            
+
         if decl.impl != None:
             for fn in decl.impl.fns:
-                self.gen_fn_decl(fn,decl.ident.string)
+                self.gen_fn_decl(fn,decl.ident.string,decl)
+                tmp_src += "\n\t self." + fn.ident.string + " = " + pre + fn.ident.string + ";"
                 pass
+            
+        src = "struct " + decl.ident.string + " " + pre + "Create("
+        for i in range(len(decl.args_init) - 1):
+            arg = decl.args_init[i + 1]
+            type = self.programs.types.lookup(arg.type.string)
+            if type != None:
+                match type.type:
+                    case TypeType.TYPE_ENUM:
+                        type = "enum " + arg.type.string
+                    case TypeType.TYPE_STRUCT:
+                        type = "struct " + arg.type.string
+                    case _:
+                        type = arg.type.string
+            else:
+                        type = arg.type.string
+
+            src += type + " " + arg.ident.string
+            if i + 1 < len(decl.args_init) - 1:
+                src += ","
+
+        src += "){" + tmp_src
+        src += "\n\treturn self.__init__("
+        src += "self,"
+
+        for i in range(len(decl.args_init) - 1):
+            arg = decl.args_init[i + 1]
+            src += arg.ident.string
+            if i + 1 < len(decl.args_init) - 1:
+                src += ","
+        src += ");"
+        src += "\n}"
+        self.source += "\n" + src
+        print(src)
 
     
     def gen_impl_decl(self,decl):
         return
 
-    def gen_fn_decl(self,decl,prefix=""):
+    def gen_fn_decl(self,decl,prefix="",struct=None):
         if prefix == "":
             pre = ""
         else:
             pre = prefix + "_"
             
-        self.source += decl.retparam.string + " " + pre + decl.ident.string + "("
+        retparam = decl.retparam.string
+        print(retparam)
+        tmp_retparam = self.programs.types.lookup(retparam)
+        if tmp_retparam != None:
+            match tmp_retparam.type:
+                case TypeType.TYPE_ENUM:
+                    retparam = "enum " + retparam
+                case TypeType.TYPE_STRUCT:
+                    retparam = "struct " + retparam
+                    
+
+        self.source += retparam + " " + pre + decl.ident.string + "("
+
+        if decl.ident.string == "__init__" and struct != None:
+            struct.args_init = decl.args
+
+        if decl.ident.string == "__fini__" and struct != None:
+            struct.args_fini = decl.args
 
         for i in range(len(decl.args)):
             arg = decl.args[i]
-            self.source += arg.type.string + " " + arg.ident.string
+            type = self.programs.types.lookup(arg.type.string)
+            if type != None:
+                match type.type:
+                    case TypeType.TYPE_ENUM:
+                        type = "enum " + arg.type.string
+                    case TypeType.TYPE_STRUCT:
+                        type = "struct " + arg.type.string
+                    case _:
+                        type = arg.type.string
+            else:
+                        type = arg.type.string
+
+            self.source += type + " " + arg.ident.string
             if i < len(decl.args) - 1:
                 self.source += ","
         
@@ -97,7 +202,19 @@ class Codegen:
         self.source += "\n}\n"
 
     def gen_var_decl(self,decl,block,tab):
-        self.source += tab + decl.type.string + " " + decl.ident.string
+        type = self.programs.types.lookup(decl.type.string)
+        if type != None:
+            match type.type:
+                case TypeType.TYPE_ENUM:
+                    type = "enum " + decl.type.string
+                case TypeType.TYPE_STRUCT:
+                    type = "struct " + decl.type.string
+                case _:
+                    type = decl.type.string
+        else:
+                    type = decl.type.string
+
+        self.source += tab + type + " " + decl.ident.string
         if decl.expr != None:
             self.source += " = "
             self.gen_expr(decl.expr,block)
@@ -119,11 +236,15 @@ class Codegen:
             case StmtType.STMT_VARDECL:
                 self.gen_var_decl(stmt.stmt,block,tab)
             
+            case StmtType.STMT_STRUCT_ACCESS:
+                self.gen_struct_access(stmt.stmt,block,tab)
+
             case StmtType.STMT_VARASSIGN:
                 self.gen_var_assign(stmt.stmt,block,tab)
 
             case StmtType.STMT_FNCALL:
                 self.gen_fncall(stmt.stmt,block,tab)
+                self.source += ";\n"
 
             case StmtType.STMT_IF:
                 self.gen_if_stmt(stmt.stmt,block,tab)
@@ -140,13 +261,44 @@ class Codegen:
             case StmtType.STMT_LOOP:
                 self.gen_loop_stmt(stmt.stmt,block,tab)
 
+    def gen_struct_access(self,stmt,block,tab):
+        
+        match stmt.type:
+            case StructAccessType.STRUCT_ACCESS_METHOD:
+                type = block.table.lookup(stmt.left.string)
+                if type == None:
+                    print("-----------------------------------------------------------------------")
+                
+                type = type.type.string
+                self.source += tab + type + "_"
+                self.gen_fncall(stmt.right,block,"")
+            
+            case StructAccessType.STRUCT_ACCESS_PROPERTY:
+                
+                self.source += tab + stmt.left.string + "."
+                self.gen_expr(stmt.right,block)
+
+        self.source += ";\n"
+            
+
     def gen_fncall(self,stmt,block,tab):
-        self.source += tab + stmt.ident.string + "("
+        ident = stmt.ident.string
+        if stmt.ident.string == "new":
+            ident = "Create"
 
-        if stmt.expr != None:
-            self.gen_expr(stmt.expr,block)
+        print("--------------------------------------------------------")
+        print(ident)
 
-        self.source += ");\n"
+
+        self.source += tab + ident + "("
+
+        for i in range(len(stmt.exprs)):
+            expr = stmt.exprs[i]
+            self.gen_expr(expr,block)
+            if i < len(stmt.exprs) - 1:
+                self.source += ","
+
+        self.source += ")"
 
     def gen_if_stmt(self,stmt,block,tab):
         self.source += tab + "if"
@@ -218,6 +370,12 @@ class Codegen:
                 self.gen_binary_expr(expr.val,block)
             case ExprType.EXPR_UNARY:
                 self.gen_unary_expr(expr.val,block)
+            case ExprType.EXPR_FNCALL:
+                self.gen_fncall_expr(expr.val,block)
+            case ExprType.EXPR_RESOLVED:
+                self.gen_resolved_expr(expr.val,block)
+            case ExprType.EXPR_GROUPING:
+                self.gen_grouping_expr(expr.val,block)
             case ExprType.EXPR_PRIMARY:
                 self.gen_primary_expr(expr.val,block)
 
@@ -231,6 +389,31 @@ class Codegen:
         self.source += expr.op.string + " "
         self.gen_expr(expr.right)
 
+    def gen_fncall_expr(self,expr,block):
+        self.gen_fncall(expr.fncall,block,"")
+
+    def gen_resolved_expr(self,expr,block): 
+        self.source += expr.left.string + "_"
+        self.gen_expr(expr.right,block)
+
+
     def gen_primary_expr(self,expr,block):
-        self.source += expr.literal.string
+
+        match expr.type:
+            case LiteralType.LIT_FALSE:
+                self.source += expr.literal.string
+            
+            case LiteralType.LIT_TRUE:
+                self.source += expr.literal.string
+
+            case LiteralType.LIT_INT:
+                self.source += expr.literal.string
+            
+            case LiteralType.LIT_FLOAT:
+                self.source += expr.literal.string
+
+            case LiteralType.LIT_STRING:
+                self.source += "\"" + expr.literal.string + "\""
+            case LiteralType.LIT_IDENT:
+                self.source += expr.literal.string
 

@@ -41,6 +41,7 @@ class TokenType(Enum):
 #   MISCELLENIOUS SYMBOLS
 
     TOKEN_COLON = ":"
+    TOKEN_RESOLUTION = "::"
     TOKEN_SEMI_COLON = ";"
     TOKEN_LBRACE = "("
     TOKEN_RBRACE = ")"
@@ -75,6 +76,7 @@ class TokenType(Enum):
     TOKEN_KEYWORD_F32 = "f32"
     TOKEN_KEYWORD_F64 = "f64"
     TOKEN_KEYWORD_FALSE = "false"
+    TOKEN_KEYWORD_FINI = "__fini__"
     TOKEN_KEYWORD_FN = "fn"
     TOKEN_KEYWORD_FOR = "for"
     TOKEN_KEYWORD_I8 = "i8"
@@ -83,6 +85,7 @@ class TokenType(Enum):
     TOKEN_KEYWORD_I64 = "i64"
     TOKEN_KEYWORD_IF = "if"
     TOKEN_KEYWORD_IMPL = "impl"
+    TOKEN_KEYWORD_INIT = "__init__"
     TOKEN_KEYWORD_LOOP = "loop"
     TOKEN_KEYWORD_NOT = "not"
     TOKEN_KEYWORD_NULL = "null"

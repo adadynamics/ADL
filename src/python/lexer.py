@@ -32,7 +32,7 @@ class Lexer:
             self.start = self.current
             self.scan_token()
 
-        self.tokens.append(Token(TokenType.TOKEN_EOF,"eof",self.start,self.length,self.row,self.col))
+        #self.tokens.append(Token(TokenType.TOKEN_EOF,"eof",self.start,self.length,self.row,self.col))
 
 
     def scan_token(self):
@@ -99,19 +99,20 @@ class Lexer:
                 self.add_token_single(TokenType.TOKEN_BITWISE_NOT,"~")
 
             case ":":
-                self.add_token_single(TokenType.TOKEN_COLON)
+                if self.peek() == ":":
+                    self.add_token_double(TokenType.TOKEN_RESOLUTION,"::")
+                else:
+                    self.add_token_single(TokenType.TOKEN_COLON)
             case ";":
                 self.add_token_single(TokenType.TOKEN_SEMI_COLON)
             case "(":
                 self.add_token_single(TokenType.TOKEN_LBRACE)
             case ")":
                 self.add_token_single(TokenType.TOKEN_RBRACE)
-            case "_":
-                self.add_token_single(TokenType.TOKEN_UNDERSCORE)
             case ",":
                 self.add_token_single(TokenType.TOKEN_COMMA)
             case ".":
-                self.add_token_single(TokenType.TOKEN_DOT)
+                self.add_token_single(TokenType.TOKEN_DOT,".")
             case " ":
                 self.update_col(1)
             case "\r":
@@ -157,33 +158,37 @@ class Lexer:
                 elif buf == "enum":
                     self.add_token(TokenType.TOKEN_KEYWORD_ENUM)
                 elif buf == "f32":
-                    self.add_token(TokenType.TOKEN_KEYWORD_F32)
+                    self.add_token(TokenType.TOKEN_KEYWORD_F32,buf)
                 elif buf == "f64":
-                    self.add_token(TokenType.TOKEN_KEYWORD_F64)
+                    self.add_token(TokenType.TOKEN_KEYWORD_F64,buf)
                 elif buf == "false":
-                    self.add_token(TokenType.TOKEN_KEYWORD_FALSE)
+                    self.add_token(TokenType.TOKEN_KEYWORD_FALSE,buf)
+                elif buf == "__fini__":
+                    self.add_token(TokenType.TOKEN_KEYWORD_FINI,buf)
                 elif buf == "fn":
                     self.add_token(TokenType.TOKEN_KEYWORD_FN)
                 elif buf == "for":
                     self.add_token(TokenType.TOKEN_KEYWORD_FOR)
                 elif buf == "i8":
-                    self.add_token(TokenType.TOKEN_KEYWORD_I8)
+                    self.add_token(TokenType.TOKEN_KEYWORD_I8,buf)
                 elif buf == "i16":
-                    self.add_token(TokenType.TOKEN_KEYWORD_I16)
+                    self.add_token(TokenType.TOKEN_KEYWORD_I16,buf)
                 elif buf == "i32":
-                    self.add_token(TokenType.TOKEN_KEYWORD_I32)
+                    self.add_token(TokenType.TOKEN_KEYWORD_I32,buf)
                 elif buf == "i64":
-                    self.add_token(TokenType.TOKEN_KEYWORD_I64)
+                    self.add_token(TokenType.TOKEN_KEYWORD_I64,buf)
                 elif buf == "if":
                     self.add_token(TokenType.TOKEN_KEYWORD_IF)
                 elif buf == "impl":
                     self.add_token(TokenType.TOKEN_KEYWORD_IMPL)
+                elif buf == "__init__":
+                    self.add_token(TokenType.TOKEN_KEYWORD_INIT,buf)
                 elif buf == "loop":
                     self.add_token(TokenType.TOKEN_KEYWORD_LOOP)
                 elif buf == "not":
                     self.add_token(TokenType.TOKEN_KEYWORD_NOT)
                 elif buf == "null":
-                    self.add_token(TokenType.TOKEN_KEYWORD_NULL)
+                    self.add_token(TokenType.TOKEN_KEYWORD_NULL,buf)
                 elif buf == "or":
                     self.add_token(TokenType.TOKEN_KEYWORD_OR)
                 elif buf == "pass":
@@ -199,19 +204,19 @@ class Lexer:
                 elif buf == "switch":
                     self.add_token(TokenType.TOKEN_KEYWORD_SWITCH)
                 elif buf == "true":
-                    self.add_token(TokenType.TOKEN_KEYWORD_TRUE)
+                    self.add_token(TokenType.TOKEN_KEYWORD_TRUE,buf)
                 elif buf == "u8":
-                    self.add_token(TokenType.TOKEN_KEYWORD_U8)
+                    self.add_token(TokenType.TOKEN_KEYWORD_U8,buf)
                 elif buf == "u16":
-                    self.add_token(TokenType.TOKEN_KEYWORD_U16)
+                    self.add_token(TokenType.TOKEN_KEYWORD_U16,buf)
                 elif buf == "u32":
-                    self.add_token(TokenType.TOKEN_KEYWORD_U32)
+                    self.add_token(TokenType.TOKEN_KEYWORD_U32,buf)
                 elif buf == "u64":
-                    self.add_token(TokenType.TOKEN_KEYWORD_U64)
+                    self.add_token(TokenType.TOKEN_KEYWORD_U64,buf)
                 elif buf == "use":
                     self.add_token(TokenType.TOKEN_KEYWORD_USE)
                 elif buf == "void":
-                    self.add_token(TokenType.TOKEN_KEYWORD_VOID)
+                    self.add_token(TokenType.TOKEN_KEYWORD_VOID,buf)
                 elif buf == "while":
                     self.add_token(TokenType.TOKEN_KEYWORD_WHILE)
                 elif buf == "with":

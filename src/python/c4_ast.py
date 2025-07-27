@@ -4,6 +4,7 @@ class Programs:
     def __init__(self):
         self.decls = []
         self.table = SymbolTable()
+        self.types = TypeTable()
 
     def add(self,program):
         self.decls.append(program)
@@ -47,6 +48,8 @@ class StructDecl:
         self.varDs = []
         self.table = SymbolTable()
         self.impl = None
+        self.args_init = []
+        self.args_fini = []
 
     def add_ident(self,ident):
         self.ident = ident
@@ -146,17 +149,37 @@ class StmtType(Enum):
     STMT_WITH = 9
     STMT_RETURN = 10
     STMT_BLOCK = 11
+    STMT_STRUCT_ACCESS = 12
 
 class FnCall:
     def __init__(self):
         self.ident = None
-        self.expr = None
+        self.exprs = []
     
     def add_ident(self,ident):
         self.ident = ident
 
     def add_expr(self,expr):
-        self.expr = expr
+        self.exprs.append(expr)
+
+class StructAccess:
+    def __init__(self):
+        self.type = None
+        self.left = None
+        self.right = None
+    
+    def add_type(self,type):
+        self.type = type
+
+    def add_left(self,left):
+        self.left = left
+
+    def add_right(self,right):
+        self.right = right
+
+class StructAccessType(Enum):
+    STRUCT_ACCESS_PROPERTY = 0
+    STRUCT_ACCESS_METHOD = 1
 
 class IfStmt:
     def __init__(self):
@@ -257,8 +280,12 @@ class Expr:
 
 class ExprType(Enum):
     EXPR_PRIMARY = 0
-    EXPR_UNARY = 1
-    EXPR_BINARY = 2
+    EXPR_GROUPING = 1
+    EXPR_FNCALL = 2
+    EXPR_RESOLVED = 3
+    EXPR_UNARY = 4
+    EXPR_BINARY = 5
+
 
 
 class BinaryExpr:
@@ -272,11 +299,31 @@ class UnaryExpr:
         self.op = op
         self.right = right
 
+class ResolvedExpr:
+    def __init__(self,left,right):
+        self.left = left
+        self.right = right
+
+class FnCallExpr:
+    def __init__(self,fncall):
+        self.fncall = fncall
+
+class GroupingExpr:
+    def __init__(self,expr):
+        self.expr = expr
+
 class PrimaryExpr:
-    def __init__(self,literal):
+    def __init__(self,literal,type):
         self.literal = literal
+        self.type = type
 
-
+class LiteralType:
+    LIT_FALSE = 0
+    LIT_TRUE = 1
+    LIT_INT = 2
+    LIT_FLOAT = 3
+    LIT_STRING = 4
+    LIT_IDENT = 5
 
 
 class Symbol:
@@ -323,3 +370,39 @@ class SymbolTable:
             scope = scope.parent
 
         return None
+    
+
+class Type:
+    def __init__(self,name,type):
+        self.name = name
+        self.type = type
+
+class TypeType(Enum):
+    TYPE_F32 = 0
+    TYPE_F64 = 1
+    TYPE_I8 = 2
+    TYPE_I16 = 3
+    TYPE_I32 = 4
+    TYPE_I64 = 5
+    TYPE_U8 = 6
+    TYPE_U16 = 7
+    TYPE_U32 = 8
+    TYPE_U64 = 9
+    TYPE_BOOL = 10
+    TYPE_ENUM = 11
+    TYPE_STRUCT = 12
+
+class TypeTable:
+    def __init__(self):
+        self.types = dict()
+
+    def add(self,name,type):
+        if self.types.get(name,None) != None:
+            return False
+        
+        self.types[name] = type
+
+    def lookup(self,name):
+        if self.types.get(name,None) == None:
+            return None
+        return self.types.get(name)

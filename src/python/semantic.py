@@ -49,6 +49,8 @@ class Resolver:
 
     def resolve_enum_decl(self,program):
 
+        self.programs.types.add(program.ident.string,Type(program.ident,TypeType.TYPE_ENUM))
+
         for constant in program.constants:
             if program.table.add(constant.string,constant) == False:
                 print(f"{constant.string} redefined")
@@ -58,6 +60,7 @@ class Resolver:
 
     def resolve_struct_decl(self,program):
         
+        self.programs.types.add(program.ident.string,Type(program.ident,TypeType.TYPE_STRUCT))
         for varD in program.varDs:
             sym = self.resolve_var_decl(varD)
             if program.table.add(varD.ident.string,sym) == False:
