@@ -109,21 +109,16 @@ class TokenType(Enum):
 
 #   OTHERS
 
-    TOKEN_ERROR_INVALID_CHARACTER = "4"                 #done
-    TOKEN_ERROR_MALFORMED_NUMBER = "5"
-    TOKEN_ERROR_UNTERMINATED_STRING = "6"               #done
-    TOKEN_ERROR_UNTERMINATED_CHARACTER = "7"
-    TOKEN_ERROR_INVALID_ESCAPE_CHARACTER = "8"
-    TOKEN_ERROR_UNTERMINATED_COMMENT = "9"
+    TOKEN_ERROR = "4"
+    TOKEN_EOF = "5"
 
 
 class Token:
-    def __init__(self,type,string,start,length,row,col,line = 0):
+    def __init__(self,type,string,start,length,row,col):
         self.type = type
         self.string = string
         self.start = start
         self.length = length
-        self.line = line
         self.row = row
         self.col = col
 

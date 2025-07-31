@@ -1,7 +1,7 @@
 from tokens import *
 
 
-#tok = Token(TokenType.TOKEN_ADD,"",0,0,0,0)
+tok = Token(TokenType.TOKEN_ADD,"",0,0,0,0)
 
 class Lexer:
 
@@ -16,8 +16,6 @@ class Lexer:
         self.length = 0
         self.row = 1
         self.col = 0
-        self.line = 0
-        self.error = False
 
     def peek(self,ahead = 0):
         if (self.index + ahead) >= self.size:
@@ -28,49 +26,8 @@ class Lexer:
         self.index += 1
         return self.file_contents[self.index - 1]
     
-    def print_error(self,token,msg):
-        end = token.start + token.length
-        string = self.file_contents[token.line:end]
-        row_width = len(str(token.row))
-        col_width = len(str(token.col))
-        offset = token.start - token.line + 2
-        
-
-        print(f" {msg} at line {token.row} col {token.col}\n")
-        print(f"                {token.row}:{token.col} |  {string}")
-        print(f"                ",end="")
-        for i in range(row_width):
-            print(" ",end="")
-        print(" ",end="")
-        
-        for i in range(col_width):
-            print(" ",end="")
-        print("  ",end="")
-        
-        for i in range(offset):
-            print(" ",end="")
-        print("^")
-
-    def print_errors(self):
-        for token in self.tokens:
-            if token.type == TokenType.TOKEN_ERROR_INVALID_CHARACTER:
-                if self.error == False:
-                    print("\n------------- Lexical Errors ----------------\n")
-
-                self.error = True
-                self.print_error(token,f"invalid token '{token.string}'")
-
-            elif token.type == TokenType.TOKEN_ERROR_UNTERMINATED_STRING:
-                if self.error == False:
-                    print("\n------------- Lexical Errors ----------------\n")
-
-                self.error = False
-                
-                self.print_error(token,"unterminated string literal")
-                
-
-
     def scan_tokens(self):
+        print(self.size)
         while self.peek() != "":
             self.start = self.current
             self.scan_token()
@@ -94,6 +51,10 @@ class Lexer:
                     self.add_token_double(TokenType.TOKEN_RETPARAM,"->")
                 else:
                     self.add_token_single(TokenType.TOKEN_SUB,"-")
+
+#            case "-":
+#                val = TokenType.TOKEN_RETPARAM if self.match_token(">") == True else TokenType.TOKEN_SUB
+#                self.add_token_single(val)
 
             case ">":
                 if self.peek() == "=":
@@ -184,30 +145,30 @@ class Lexer:
                     self.update_col(len(buf))
 
                 if buf == "and":
-                    self.add_token(TokenType.TOKEN_KEYWORD_AND,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_AND)
                 elif buf == "alloc":
                     if self.peek() == "!":
                         self.add_token(TokenType.TOKEN_KEYWORD_ALLOC,buf)
                 elif buf == "break":
-                    self.add_token(TokenType.TOKEN_KEYWORD_BREAK,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_BREAK)
                 elif buf == "bool":
-                    self.add_token(TokenType.TOKEN_KEYWORD_BOOL,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_BOOL)
                 elif buf == "case":
-                    self.add_token(TokenType.TOKEN_KEYWORD_CASE,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_CASE)
                 elif buf == "const":
-                    self.add_token(TokenType.TOKEN_KEYWORD_CONST,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_CONST)
                 elif buf == "continue":
-                    self.add_token(TokenType.TOKEN_KEYWORD_CONTINUE,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_CONTINUE)
                 elif buf == "default":
-                    self.add_token(TokenType.TOKEN_KEYWORD_DEFAULT,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_DEFAULT)
                 elif buf == "do":
-                    self.add_token(TokenType.TOKEN_KEYWORD_DO,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_DO)
                 elif buf == "elif":
-                    self.add_token(TokenType.TOKEN_KEYWORD_ELIF,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_ELIF)
                 elif buf == "else":
-                    self.add_token(TokenType.TOKEN_KEYWORD_ELSE,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_ELSE)
                 elif buf == "enum":
-                    self.add_token(TokenType.TOKEN_KEYWORD_ENUM,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_ENUM)
                 elif buf == "f32":
                     self.add_token(TokenType.TOKEN_KEYWORD_F32,buf)
                 elif buf == "f64":
@@ -217,9 +178,9 @@ class Lexer:
                 elif buf == "__fini__":
                     self.add_token(TokenType.TOKEN_KEYWORD_FINI,buf)
                 elif buf == "fn":
-                    self.add_token(TokenType.TOKEN_KEYWORD_FN,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_FN)
                 elif buf == "for":
-                    self.add_token(TokenType.TOKEN_KEYWORD_FOR,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_FOR)
                 elif buf == "i8":
                     self.add_token(TokenType.TOKEN_KEYWORD_I8,buf)
                 elif buf == "i16":
@@ -229,31 +190,31 @@ class Lexer:
                 elif buf == "i64":
                     self.add_token(TokenType.TOKEN_KEYWORD_I64,buf)
                 elif buf == "if":
-                    self.add_token(TokenType.TOKEN_KEYWORD_IF,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_IF)
                 elif buf == "impl":
-                    self.add_token(TokenType.TOKEN_KEYWORD_IMPL,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_IMPL)
                 elif buf == "__init__":
                     self.add_token(TokenType.TOKEN_KEYWORD_INIT,buf)
                 elif buf == "loop":
-                    self.add_token(TokenType.TOKEN_KEYWORD_LOOP,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_LOOP)
                 elif buf == "not":
-                    self.add_token(TokenType.TOKEN_KEYWORD_NOT,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_NOT)
                 elif buf == "null":
                     self.add_token(TokenType.TOKEN_KEYWORD_NULL,buf)
                 elif buf == "or":
-                    self.add_token(TokenType.TOKEN_KEYWORD_OR,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_OR)
                 elif buf == "pass":
-                    self.add_token(TokenType.TOKEN_KEYWORD_PASS,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_PASS)
                 elif buf == "pub":
-                    self.add_token(TokenType.TOKEN_KEYWORD_PUB,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_PUB)
                 elif buf == "return":
-                    self.add_token(TokenType.TOKEN_KEYWORD_RETURN,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_RETURN)
                 elif buf == "self":
-                    self.add_token(TokenType.TOKEN_KEYWORD_SELF,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_SELF)
                 elif buf == "struct":
-                    self.add_token(TokenType.TOKEN_KEYWORD_STRUCT,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_STRUCT)
                 elif buf == "switch":
-                    self.add_token(TokenType.TOKEN_KEYWORD_SWITCH,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_SWITCH)
                 elif buf == "true":
                     self.add_token(TokenType.TOKEN_KEYWORD_TRUE,buf)
                 elif buf == "u8":
@@ -265,13 +226,13 @@ class Lexer:
                 elif buf == "u64":
                     self.add_token(TokenType.TOKEN_KEYWORD_U64,buf)
                 elif buf == "use":
-                    self.add_token(TokenType.TOKEN_KEYWORD_USE,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_USE)
                 elif buf == "void":
                     self.add_token(TokenType.TOKEN_KEYWORD_VOID,buf)
                 elif buf == "while":
-                    self.add_token(TokenType.TOKEN_KEYWORD_WHILE,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_WHILE)
                 elif buf == "with":
-                    self.add_token(TokenType.TOKEN_KEYWORD_WITH,buf)
+                    self.add_token(TokenType.TOKEN_KEYWORD_WITH)
                 else:
                     self.add_token(TokenType.TOKEN_IDENT,buf)
             case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
@@ -290,25 +251,14 @@ class Lexer:
                 self.update_col(len(buf))
             
             case "\"":
-                error = False
                 buf = ""
                 while self.peek() != "\"":
-                    if self.peek() == "":
-                        error = True
-                        break
-
                     buf += self.consume()
 
-                if error == True:
-                    self.add_token(TokenType.TOKEN_ERROR_UNTERMINATED_STRING,buf)
-                else:
-                    self.consume()
-                    self.add_token(TokenType.TOKEN_LITERAL_STRING,buf)
-                
+                self.consume()
+                self.add_token(TokenType.TOKEN_LITERAL_STRING,buf)
                 self.update_col(len(buf) + 2)
-                
-            case _:
-                self.add_token_single(TokenType.TOKEN_ERROR_INVALID_CHARACTER,char)
+                print(len(buf) + 2)
 
     def match_token(self,expected):
         if self.peek() != expected:
@@ -318,7 +268,6 @@ class Lexer:
 
     def update_row(self,row_dx):
         self.row += row_dx
-        self.line = self.index
         self.col = 0
 
     def update_col(self,col_dx):
@@ -336,4 +285,4 @@ class Lexer:
         self.update_col(1)
 
     def add_token(self,type,string = ""):
-        self.tokens.append(Token(type,string,self.start,self.length,self.row,self.col,self.line))
+        self.tokens.append(Token(type,string,self.start,self.length,self.row,self.col))

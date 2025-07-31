@@ -15,19 +15,14 @@ if __name__ == "__main__":
         buf = file.read()
     lex = Lexer(buf)
     lex.scan_tokens()
-    lex.print_errors()
-
-    if lex.error == True:
-        sys.exit(1)
     
     """
     for tok in lex.tokens:
         print(tok.type)
     """
-    parser = Parser(lex.tokens,lex.file_contents)
+    parser = Parser(lex.tokens)
     parser.parse_programs()
 
-    sys.exit(1)
     buildtable = BuildSymbolTable(parser.programs)
     buildtable.build_symboltable_programs()
 

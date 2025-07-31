@@ -3,7 +3,7 @@
 
 
 python3 c4.py $1
-#make
+make
 #make clean
 
 
